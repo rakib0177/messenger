@@ -351,15 +351,32 @@
         });
 
         // Realtime loading of Users and Groups
+        // function loadChatsAndGroups() {
+        //     // Load Users First
+        //     db.collection('users').onSnapshot(userSnapshot => {
+        //         allUsersCache = [];
+        //         userSnapshot.forEach(doc => {
+        //             if (doc.data().uid !== currentUser.uid) allUsersCache.push(doc.data());
+        //         });
+
+        //         // Load Groups and Render unified list
+        //         db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
+        //             renderSidebar(allUsersCache, groupSnapshot);
+        //         });
+        //     });
+        // }
+        // সংশোধিত ফাংশনটি এখানে বসান
         function loadChatsAndGroups() {
-            // Load Users First
+            // ইউজার্স এবং রুমস একসাথে আপডেট পাওয়ার জন্য লিসেনার
             db.collection('users').onSnapshot(userSnapshot => {
                 allUsersCache = [];
                 userSnapshot.forEach(doc => {
-                    if (doc.data().uid !== currentUser.uid) allUsersCache.push(doc.data());
+                    if (doc.data().uid !== currentUser.uid) {
+                        allUsersCache.push(doc.data());
+                    }
                 });
 
-                // Load Groups and Render unified list
+                // গ্রুপগুলো ডাটাবেস থেকে নিয়ে আসা
                 db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
                     renderSidebar(allUsersCache, groupSnapshot);
                 });
