@@ -1,12 +1,13 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>praivate messenger</title>
+    <title>private messenger</title>
     <!-- Google Fonts & Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap"
         rel="stylesheet">
 
     <style>
@@ -75,9 +76,9 @@
     <div id="chat-screen"
         class="glass-panel w-full max-w-5xl h-screen md:h-[85vh] md:rounded-3xl shadow-2xl flex hidden overflow-hidden relative">
 
-        <!-- LEFT SIDEBAR -->
+        <!-- LEFT SIDEBAR (CHATS & GROUPS MENU) -->
         <div id="sidebar-panel"
-            class="absolute inset-0 z-20 md:relative md:inset-auto w-full md:w-1/3 border-r border-white/10 flex flex-col bg-slate-900 md:bg-slate-900/20 transition-transform duration-300">
+            class="absolute inset-0 z-20 md:relative md:inset-auto w-full md:w-1/3 border-r border-white/10 flex flex-col bg-slate-900 md:bg-slate-900/20 transition-transform duration-300 transform -translate-x-full md:translate-x-0 hidden md:flex">
             <div class="p-4 border-b border-white/10 bg-white/5 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2 min-w-0">
@@ -350,24 +351,8 @@
             }).then(() => alert("Group Created Successfully!"));
         });
 
-        // Realtime loading of Users and Groups
-        // function loadChatsAndGroups() {
-        //     // Load Users First
-        //     db.collection('users').onSnapshot(userSnapshot => {
-        //         allUsersCache = [];
-        //         userSnapshot.forEach(doc => {
-        //             if (doc.data().uid !== currentUser.uid) allUsersCache.push(doc.data());
-        //         });
-
-        //         // Load Groups and Render unified list
-        //         db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
-        //             renderSidebar(allUsersCache, groupSnapshot);
-        //         });
-        //     });
-        // }
-        // সংশোধিত ফাংশনটি এখানে বসান
+        // Realtime loading of Users and Groups (Unified Fix)
         function loadChatsAndGroups() {
-            // ইউজার্স এবং রুমস একসাথে আপডেট পাওয়ার জন্য লিসেনার
             db.collection('users').onSnapshot(userSnapshot => {
                 allUsersCache = [];
                 userSnapshot.forEach(doc => {
@@ -376,17 +361,18 @@
                     }
                 });
 
-                // গ্রুপগুলো ডাটাবেস থেকে নিয়ে আসা
                 db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
                     renderSidebar(allUsersCache, groupSnapshot);
                 });
+            }, error => {
+                console.error("Error loading users: ", error);
             });
         }
 
         function renderSidebar(users, groupSnapshot) {
             usersListContainer.innerHTML = '';
 
-            // Render Groups First
+            // 1. Render Groups First
             groupSnapshot.forEach(doc => {
                 const groupData = doc.data();
                 if (!groupData.members.includes(currentUser.uid)) return;
@@ -410,7 +396,7 @@
                 usersListContainer.appendChild(row);
             });
 
-            // Render Individual Users
+            // 2. Render Individual Users
             users.forEach(userData => {
                 const row = document.createElement('div');
                 row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5`;
@@ -445,7 +431,11 @@
             } else {
                 activeChatBioContainer.classList.add('hidden');
             }
-            if (window.innerWidth < 768) sidebarPanel.classList.add('hidden');
+            // Hide sidebar on small screens after choosing a chat
+            if (window.innerWidth < 768) {
+                sidebarPanel.classList.add('hidden');
+                sidebarPanel.classList.add('-translate-x-full');
+            }
         }
 
         // Send Chat Message
@@ -495,7 +485,7 @@
             if (!msg.createdAt) return;
             const isMe = msg.senderId === currentUser.uid;
             const row = document.createElement('div');
-            row.className = `flex items-end gap-2.5 ${isMe ? 'justify-end' : 'justify-start'} group`;
+            row.className = `flex items-end gap-2.5 ${isMe ? 'justify-end' : 'justify-start'} group mb-2`;
 
             let bodyContent = msg.image
                 ? `<img src="${msg.image}" class="max-w-xs rounded-xl max-h-60 object-cover mt-1 border border-white/10 cursor-pointer" onclick="window.open(this.src)">`
@@ -504,7 +494,7 @@
             // Dynamic Action Panel (Delete/Forward)
             let actionButtons = `
                 <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onclick="forwardMessage('${msgId}', \`${btoa(unescape(encodeURIComponent(msg.text)))}\`, '${msg.image || ''}')" class="text-[10px] text-indigo-400 bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:bg-indigo-900/40">Forward ➡️</button>
+                    <button onclick="forwardMessage('${msgId}', \`${btoa(unescape(encodeURIComponent(msg.text || '')))}\`, '${msg.image || ''}')" class="text-[10px] text-indigo-400 bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:bg-indigo-900/40">Forward ➡️</button>
                     ${isMe ? `<button onclick="deleteMessage('${msgId}')" class="text-[10px] text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-500/20 hover:bg-rose-900/40">Delete 🗑️</button>` : ''}
                 </div>
             `;
@@ -566,9 +556,21 @@
             }
         });
 
-        // UI Responsive Helpers
-        btnToggleUsers.addEventListener('click', () => sidebarPanel.classList.toggle('hidden'));
-        btnCloseSidebar.addEventListener('click', () => sidebarPanel.classList.add('hidden'));
+        // UI Responsive & Menu/Sidebar Toggle Helpers
+        btnToggleUsers.addEventListener('click', () => {
+            if (sidebarPanel.classList.contains('hidden')) {
+                sidebarPanel.classList.remove('hidden');
+                setTimeout(() => sidebarPanel.classList.remove('-translate-x-full'), 10);
+            } else {
+                sidebarPanel.classList.add('-translate-x-full');
+                setTimeout(() => sidebarPanel.classList.add('hidden'), 300);
+            }
+        });
+
+        btnCloseSidebar.addEventListener('click', () => {
+            sidebarPanel.classList.add('-translate-x-full');
+            setTimeout(() => sidebarPanel.classList.add('hidden'), 300);
+        });
 
         function resetChatArea() {
             currentRoomId = null;
@@ -579,6 +581,7 @@
         }
 
         function escapeHTML(str) {
+            if (!str) return '';
             return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
     </script>
