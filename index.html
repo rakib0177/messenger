@@ -76,7 +76,7 @@
     <div id="chat-screen"
         class="glass-panel w-full max-w-5xl h-screen md:h-[85vh] md:rounded-3xl shadow-2xl flex hidden overflow-hidden relative">
 
-        <!-- LEFT SIDEBAR (CHATS & GROUPS MENU) -->
+        <!-- LEFT SIDEBAR -->
         <div id="sidebar-panel"
             class="absolute inset-0 z-20 md:relative md:inset-auto w-full md:w-1/3 border-r border-white/10 flex flex-col bg-slate-900 md:bg-slate-900/20 transition-transform duration-300 transform -translate-x-full md:translate-x-0 hidden md:flex">
             <div class="p-4 border-b border-white/10 bg-white/5 space-y-3">
@@ -86,12 +86,13 @@
                             class="w-8 h-8 rounded-full border border-indigo-500/30 object-cover shrink-0">
                         <span id="user-display-name"
                             class="text-white font-semibold text-xs truncate max-w-[120px]">Loading...</span>
-                        <button id="btn-edit-profile" title="Change Name/Avatar"
-                            class="text-slate-400 hover:text-white text-xs">⚙️</button>
+                        <button id="btn-edit-profile" title="Change Profile"
+                            class="text-slate-400 hover:text-white text-sm bg-white/5 p-1 rounded-lg border border-white/10">⚙️</button>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <button id="btn-close-sidebar"
-                            class="md:hidden text-[10px] text-slate-400 border border-white/10 px-2 py-1 rounded-xl bg-white/5">Back</button>
+                            class="md:hidden text-xs text-slate-300 border border-white/10 px-2.5 py-1 rounded-xl bg-white/5 font-medium">✕
+                            Close</button>
                         <button id="btn-logout"
                             class="text-[10px] font-medium text-slate-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/30 px-2 py-1 rounded-xl transition-all bg-white/5">Logout</button>
                     </div>
@@ -105,7 +106,6 @@
                     </p>
                     <p id="user-bio-text" class="text-xs text-slate-300 italic line-clamp-2">No bio set yet.</p>
                 </div>
-                <!-- Group Creation Button -->
                 <button id="btn-create-group"
                     class="w-full bg-indigo-600/40 hover:bg-indigo-600/60 text-white text-xs py-2 px-3 rounded-xl border border-indigo-500/30 transition-all font-medium">
                     ➕ Create 4-5 Member Group
@@ -121,45 +121,65 @@
             class="flex-1 flex flex-col bg-slate-950/10 w-full min-w-0 transition-all duration-300">
             <!-- Active Chat Header -->
             <div id="chat-header-active"
-                class="px-4 md:px-6 py-3 border-b border-white/10 flex flex-col bg-white/5 gap-2 shrink-0">
-                <div class="flex items-center justify-between min-w-0">
-                    <div class="flex items-center gap-3 min-w-0 cursor-pointer" id="active-chat-profile-trigger"
-                        title="Click to view profile">
+                class="px-3 md:px-6 py-3 border-b border-white/10 flex flex-col bg-white/5 gap-2 shrink-0">
+                <div class="flex items-center justify-between min-w-0 gap-2">
+                    <!-- Profile Section -->
+                    <div class="flex items-center gap-2 md:gap-3 min-w-0 cursor-pointer bg-white/5 md:bg-transparent p-1.5 md:p-0 rounded-2xl border border-white/5 md:border-none"
+                        id="active-chat-profile-trigger" title="View profile">
                         <img id="active-chat-avatar" src="https://via.placeholder.com/150" alt="Avatar"
-                            class="w-10 h-10 rounded-full border border-white/10 object-cover hover:scale-105 transition-transform">
+                            class="w-9 h-9 md:w-10 md:h-10 rounded-full border border-white/10 object-cover hover:scale-105 transition-transform shrink-0">
                         <div class="min-w-0">
                             <h2 id="active-chat-name"
-                                class="text-white font-semibold text-sm leading-none mb-1 truncate">Select a user/group
+                                class="text-white font-semibold text-xs md:text-sm leading-tight mb-0.5 truncate">Select
+                                a user/group
                             </h2>
-                            <span id="active-chat-status" class="text-slate-400 text-xs flex items-center gap-1 hidden">
+                            <span id="active-chat-status"
+                                class="text-slate-400 text-[10px] md:text-xs flex items-center gap-1 hidden">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Chat
                             </span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <!-- Calling Buttons -->
-                        <div id="call-buttons-container" class="flex items-center gap-1 mr-2 hidden">
+
+                    <!-- Actions and Calling Icons Container (Beautifully Styled for Mobile) -->
+                    <div class="flex items-center gap-1 md:gap-2 shrink-0">
+                        <!-- Calling Group Buttons -->
+                        <div id="call-buttons-container" class="flex items-center gap-1 hidden">
                             <button id="btn-audio-call" title="Audio Call"
-                                class="p-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/40 transition-all text-xs">📞</button>
+                                class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl hover:bg-emerald-500/40 text-sm transition-all active:scale-95 shadow-md">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                                </svg>
+                            </button>
                             <button id="btn-video-call" title="Video Call"
-                                class="p-2 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl hover:bg-indigo-500/40 transition-all text-xs">📹</button>
+                                class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl hover:bg-indigo-500/40 text-sm transition-all active:scale-95 shadow-md">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" />
+                                </svg>
+                            </button>
                         </div>
-                        <!-- Theme/Color Selector -->
+
+                        <!-- Theme picker on desktop/tablet only to keep mobile neat -->
                         <select id="chat-color-picker"
-                            class="bg-slate-800 text-white text-xs px-2 py-1.5 rounded-xl border border-white/10 focus:outline-none hidden">
-                            <option value="transparent">Default Theme</option>
-                            <option value="rgba(239, 68, 68, 0.2)">🔴 Red Theme</option>
-                            <option value="rgba(0, 0, 0, 0.6)">⚫ Black Theme</option>
-                            <option value="rgba(59, 130, 246, 0.2)">🔵 Blue Theme</option>
-                            <option value="rgba(234, 179, 8, 0.2)">🟡 Yellow Theme</option>
-                            <option value="rgba(236, 72, 153, 0.2)">💗 Pink Theme</option>
+                            class="bg-slate-800 text-white text-[11px] px-1.5 py-1.5 rounded-xl border border-white/10 focus:outline-none hidden md:inline-block max-w-[80px]">
+                            <option value="transparent">Theme</option>
+                            <option value="rgba(239, 68, 68, 0.2)">🔴 Red</option>
+                            <option value="rgba(0, 0, 0, 0.6)">⚫ Black</option>
+                            <option value="rgba(59, 130, 246, 0.2)">🔵 Blue</option>
+                            <option value="rgba(234, 179, 8, 0.2)">🟡 Yellow</option>
+                            <option value="rgba(236, 72, 153, 0.2)">💗 Pink</option>
                         </select>
-                        <button id="btn-clear-history"
-                            class="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2 py-1.5 rounded-xl hidden">🗑️
-                            Clear All</button>
+
+                        <button id="btn-clear-history" title="Clear Chat"
+                            class="p-2 md:px-2.5 md:py-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-xl hidden transition-all active:scale-95">
+                            <span class="md:hidden">🗑️</span><span class="hidden md:inline">Clear All</span>
+                        </button>
+
                         <button id="btn-toggle-users"
-                            class="glass-button text-xs text-white px-3 py-2 rounded-xl font-medium shadow-md">👥
-                            Menu</button>
+                            class="glass-button text-xs text-white px-3 py-2 rounded-xl font-medium shadow-md transition-all active:scale-95 flex items-center gap-1">
+                            <span>👥</span> <span class="hidden sm:inline">Menu</span>
+                        </button>
                     </div>
                 </div>
                 <div id="active-chat-bio-container"
@@ -179,55 +199,69 @@
             </div>
 
             <!-- Input Area -->
-            <div id="input-area-container" class="p-4 border-t border-white/10 bg-white/5 hidden shrink-0">
+            <div id="input-area-container" class="p-3 md:p-4 border-t border-white/10 bg-white/5 hidden shrink-0">
                 <form id="chat-form" class="flex gap-2 items-center">
                     <input type="file" id="image-attachment-input" accept="image/*" class="hidden">
                     <button type="button" id="btn-attach-image" title="Send a Photo"
-                        class="w-11 h-11 rounded-2xl bg-slate-800 border border-white/10 hover:border-indigo-500/40 text-lg flex items-center justify-center text-slate-300 transition-all shrink-0">🖼️</button>
+                        class="w-11 h-11 rounded-2xl bg-slate-800 border border-white/10 hover:border-indigo-500/40 text-lg flex items-center justify-center text-slate-300 transition-all shrink-0 active:scale-95">🖼️</button>
                     <input type="text" id="message-input" autocomplete="off" placeholder="Type a message..."
                         class="flex-1 bg-slate-900/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 text-sm transition-all">
                     <button type="submit"
-                        class="glass-button text-white px-5 py-3 rounded-2xl font-semibold text-sm shadow-md flex items-center justify-center shrink-0">Send</button>
+                        class="glass-button text-white px-5 py-3 rounded-2xl font-semibold text-sm shadow-md flex items-center justify-center shrink-0 active:scale-95">Send</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- PROFILE VIEW POPUP MODAL -->
+    <!-- PROFILE VIEW MODAL -->
     <div id="profile-modal"
         class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden p-4 backdrop-blur-md">
-        <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center relative text-white">
+        <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center relative text-white animate-scale-up">
             <button id="btn-close-profile-modal"
                 class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
             <img id="modal-profile-img" src=""
-                class="w-28 h-28 rounded-full mx-auto object-cover border-2 border-indigo-500/50 mb-4 shadow-xl">
-            <h3 id="modal-profile-name" class="text-xl font-bold tracking-tight mb-1">Name</h3>
-            <p id="modal-profile-type" class="text-indigo-400 font-medium text-xs mb-4">User Profile</p>
+                class="w-24 h-24 rounded-full mx-auto object-cover border-2 border-indigo-500/50 mb-4 shadow-xl">
+            <h3 id="modal-profile-name" class="text-lg font-bold tracking-tight mb-1">Name</h3>
+            <p id="modal-profile-type" class="text-indigo-400 font-medium text-[11px] mb-4">User Profile</p>
             <div class="bg-black/30 p-3 rounded-xl border border-white/5 text-left">
                 <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">About /
                     Biography</span>
-                <p id="modal-profile-bio" class="text-sm text-slate-200 italic break-words">No Bio</p>
+                <p id="modal-profile-bio" class="text-xs text-slate-200 italic break-words">No Bio</p>
             </div>
         </div>
     </div>
 
-    <!-- CALL INTERFACE MODAL -->
+    <!-- MAIN CALL SIGNALLING INTERFACE MODAL -->
     <div id="call-modal"
-        class="fixed inset-0 bg-slate-950/90 z-50 flex flex-col items-center justify-center hidden text-white p-4 animate-fade-in">
+        class="fixed inset-0 bg-slate-950/95 z-50 flex flex-col items-center justify-center hidden text-white p-4">
         <div class="text-center space-y-6 max-w-sm w-full">
             <div class="relative inline-block">
                 <img id="call-user-img" src="https://via.placeholder.com/150"
-                    class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 animate-pulse mx-auto">
-                <div class="absolute bottom-1 right-2 bg-emerald-500 w-5 h-5 rounded-full border-4 border-slate-950">
-                </div>
+                    class="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-indigo-500 animate-pulse mx-auto">
+                <div id="call-type-indicator"
+                    class="absolute -bottom-1 -right-1 bg-indigo-600 p-2 rounded-full border-2 border-slate-950 text-xs">
+                    📞</div>
             </div>
             <div>
-                <h3 id="call-user-name" class="text-2xl font-bold">User Name</h3>
-                <p id="call-status-text" class="text-indigo-400 text-sm mt-1 animate-bounce">Ringing...</p>
+                <h3 id="call-user-name" class="text-xl md:text-2xl font-bold">User Name</h3>
+                <p id="call-status-text" class="text-indigo-400 text-sm mt-1 tracking-wide">Ringing...</p>
             </div>
-            <div class="flex justify-center gap-6 pt-8">
-                <button id="btn-end-call"
-                    class="w-14 h-14 bg-rose-500 hover:bg-rose-600 rounded-full flex items-center justify-center text-xl shadow-lg transition-transform hover:scale-110">🤙</button>
+
+            <!-- Dynamic Action Buttons for Calling (Answer/Decline) -->
+            <div id="call-actions-container" class="flex justify-center gap-6 pt-6">
+                <!-- Outgoing Call Buttons -->
+                <button id="btn-end-outgoing-call"
+                    class="w-14 h-14 bg-rose-500 hover:bg-rose-600 rounded-full flex items-center justify-center text-lg shadow-lg transition-all active:scale-95">❌</button>
+
+                <!-- Incoming Call Buttons Structure (Hidden by default) -->
+                <div id="incoming-call-buttons" class="flex gap-6 hidden">
+                    <button id="btn-decline-incoming"
+                        class="w-14 h-14 bg-rose-600 hover:bg-rose-700 rounded-full flex items-center justify-center text-lg shadow-lg transition-all active:scale-95"
+                        title="Decline">🔻</button>
+                    <button id="btn-accept-incoming"
+                        class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center text-lg shadow-lg transition-all active:scale-95"
+                        title="Accept">🟢</button>
+                </div>
             </div>
         </div>
     </div>
@@ -254,26 +288,55 @@
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
-        // HTML5 Audio Context Setup for Notification Sound
+        // HTML5 Audio Context Sound System
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let ringtoneInterval = null;
+
         function playNotificationSound() {
             try {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 Note
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); // A5 Note
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.3);
-            } catch (e) { console.log("Audio play blocked"); }
+            } catch (e) { console.log(e); }
         }
 
-        // DOM Elements
+        function startRingtoneSound() {
+            stopRingtoneSound();
+            ringtoneInterval = setInterval(() => {
+                try {
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(660, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.8);
+                } catch (e) { }
+            }, 1000);
+        }
+
+        function stopRingtoneSound() {
+            if (ringtoneInterval) {
+                clearInterval(ringtoneInterval);
+                ringtoneInterval = null;
+            }
+        }
+
+        // DOM Element Definitions
         const loginScreen = document.getElementById('login-screen');
         const chatScreen = document.getElementById('chat-screen');
         const sidebarPanel = document.getElementById('sidebar-panel');
@@ -306,7 +369,7 @@
         const btnAudioCall = document.getElementById('btn-audio-call');
         const btnVideoCall = document.getElementById('btn-video-call');
 
-        // Modal Modals
+        // Modal Elements
         const profileModal = document.getElementById('profile-modal');
         const btnCloseProfileModal = document.getElementById('btn-close-profile-modal');
         const modalProfileImg = document.getElementById('modal-profile-img');
@@ -319,18 +382,23 @@
         const callUserImg = document.getElementById('call-user-img');
         const callUserName = document.getElementById('call-user-name');
         const callStatusText = document.getElementById('call-status-text');
-        const btnEndCall = document.getElementById('btn-end-call');
+        const callTypeIndicator = document.getElementById('call-type-indicator');
+        const btnEndOutgoingCall = document.getElementById('btn-end-outgoing-call');
+        const incomingCallButtons = document.getElementById('incoming-call-buttons');
+        const btnDeclineIncoming = document.getElementById('btn-decline-incoming');
+        const btnAcceptIncoming = document.getElementById('btn-accept-incoming');
 
         let currentUser = null;
         let activeChatUserId = null;
         let isGroupChat = false;
         let currentRoomId = null;
         let messagesUnsubscribe = null;
+        let callSessionUnsubscribe = null;
         let allUsersCache = [];
         let roomLastMessageTimes = {};
-        let initialLoadDone = false;
+        let currentActiveCallId = null;
 
-        // Auth Observer
+        // Auth Listener & Inbound Signaling Initialization
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
@@ -354,9 +422,11 @@
                     }, { merge: true });
                 });
                 loadChatsAndGroups();
+                listenForIncomingCalls(); // Realtime Call Listener Activation
             } else {
                 currentUser = null;
                 if (messagesUnsubscribe) messagesUnsubscribe();
+                if (callSessionUnsubscribe) callSessionUnsubscribe();
                 chatScreen.classList.add('hidden');
                 loginScreen.classList.remove('hidden');
                 resetChatArea();
@@ -382,40 +452,35 @@
             }
         });
 
-        // Edit Profile Name and Picture URL Function
         btnEditProfile.addEventListener('click', () => {
             const newName = prompt("Enter new display name:", currentUser.displayName);
             if (!newName || newName.trim() === "") return;
             const newPhotoURL = prompt("Enter profile picture URL:", currentUser.photoURL || "");
 
-            if (newName.trim() !== "") {
-                currentUser.updateProfile({
+            currentUser.updateProfile({
+                displayName: newName.trim(),
+                photoURL: newPhotoURL ? newPhotoURL.trim() : currentUser.photoURL
+            }).then(() => {
+                userDisplayName.textContent = newName.trim();
+                if (newPhotoURL) userAvatar.src = newPhotoURL.trim();
+                db.collection('users').doc(currentUser.uid).update({
                     displayName: newName.trim(),
                     photoURL: newPhotoURL ? newPhotoURL.trim() : currentUser.photoURL
-                }).then(() => {
-                    userDisplayName.textContent = newName.trim();
-                    if (newPhotoURL) userAvatar.src = newPhotoURL.trim();
-                    db.collection('users').doc(currentUser.uid).update({
-                        displayName: newName.trim(),
-                        photoURL: newPhotoURL ? newPhotoURL.trim() : currentUser.photoURL
-                    });
-                    alert("Profile updated successfully!");
-                }).catch(err => alert("Error updating profile: " + err.message));
-            }
+                });
+                alert("Profile updated!");
+            }).catch(err => alert(err.message));
         });
 
-        // Background Color Picker
         chatColorPicker.addEventListener('change', (e) => {
             chatMainArea.style.backgroundColor = e.target.value;
         });
 
-        // Image Attachment
         btnAttachImage.addEventListener('click', () => imageAttachmentInput.click());
         imageAttachmentInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file || !currentRoomId) return;
-            if (!file.type.startsWith('image/')) return alert('Please select an image file.');
-            if (file.size > 1000000) return alert('Image size must be under 1MB.');
+            if (!file.type.startsWith('image/')) return alert('Select image file.');
+            if (file.size > 1000000) return alert('Must be under 1MB.');
 
             const reader = new FileReader();
             reader.onload = function (event) {
@@ -425,14 +490,10 @@
             e.target.value = '';
         });
 
-        // Create 4-5 Member Group
         btnCreateGroup.addEventListener('click', () => {
-            if (allUsersCache.length < 3) {
-                return alert("Not enough users registered to create a 4-5 member group.");
-            }
+            if (allUsersCache.length < 3) return alert("Not enough users registered.");
             let userOptions = allUsersCache.map((u, index) => `${index + 1}. ${u.displayName}`).join('\n');
-            let selections = prompt(`Enter user numbers separated by comma (e.g., 1,2,3) to add to group:\n\n${userOptions}`);
-
+            let selections = prompt(`Enter numbers separated by comma to add to group:\n\n${userOptions}`);
             if (!selections) return;
             let indices = selections.split(',').map(num => parseInt(num.trim()) - 1);
             let selectedMembers = [currentUser.uid];
@@ -444,12 +505,8 @@
                     memberNames.push(allUsersCache[idx].displayName);
                 }
             });
-
-            if (selectedMembers.length < 3 || selectedMembers.length > 6) {
-                return alert("Group must have between 3 to 5 extra members (Total 4-6 members).");
-            }
-
-            let groupName = prompt("Enter a name for your new Group:");
+            if (selectedMembers.length < 3) return alert("Invalid group count.");
+            let groupName = prompt("Enter Group Name:");
             if (!groupName || groupName.trim() === "") groupName = "Premium Power Group";
 
             db.collection('rooms').add({
@@ -459,41 +516,143 @@
                 memberNames: memberNames,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 createdBy: currentUser.uid
-            }).then(() => alert("Group Created Successfully!"));
+            }).then(() => alert("Group Created!"));
         });
 
-        // Profile View Logic
+        // Profile Modal Display Triggers
         activeChatProfileTrigger.addEventListener('click', () => {
             if (!currentRoomId) return;
             modalProfileName.textContent = activeChatName.textContent;
             modalProfileImg.src = activeChatAvatar.src;
             if (isGroupChat) {
                 modalProfileType.textContent = "Group Conversation";
-                modalProfileBio.textContent = activeChatBio.textContent || "No summary config available for this group.";
+                modalProfileBio.textContent = activeChatBio.textContent || "Active continuous group environment.";
             } else {
-                modalProfileType.textContent = "Private Contact";
-                modalProfileBio.textContent = activeChatBio.textContent || "No description / bio added by user.";
+                modalProfileType.textContent = "Private Partner Account";
+                modalProfileBio.textContent = activeChatBio.textContent || "No description set by developer/user.";
             }
             profileModal.classList.remove('hidden');
         });
         btnCloseProfileModal.addEventListener('click', () => profileModal.classList.add('hidden'));
 
-        // Calling UI Trigger Simulation
-        function runCallSimulation(type) {
-            callUserName.textContent = activeChatName.textContent;
-            callUserImg.src = activeChatAvatar.src;
-            callStatusText.textContent = `Establishing ${type} Connection...`;
-            callModal.classList.remove('hidden');
 
-            setTimeout(() => {
-                callStatusText.textContent = `On Live ${type} Call (Encrypted)`;
-            }, 2500);
+        /*************************************************************
+         * REALTIME CALL SIGNALLING SYSTEM (FIXED HUB)
+         *************************************************************/
+
+        // 1. Listen for Incoming Calls directed to Current logged user
+        function listenForIncomingCalls() {
+            db.collection('calls')
+                .where('targetId', '==', currentUser.uid)
+                .where('status', '==', 'dialing')
+                .onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const callData = snapshot.docs[0].data();
+                        currentActiveCallId = snapshot.docs[0].id;
+
+                        // Show Incoming UI View Panel
+                        callUserName.textContent = callData.senderName;
+                        callUserImg.src = callData.senderAvatar || 'https://via.placeholder.com/150';
+                        callStatusText.textContent = `Incoming ${callData.type} Call...`;
+                        callTypeIndicator.textContent = callData.type === 'Video' ? '📹' : '📞';
+
+                        btnEndOutgoingCall.classList.add('hidden');
+                        incomingCallButtons.classList.remove('hidden');
+                        callModal.classList.remove('hidden');
+                        startRingtoneSound();
+
+                        // Listen if sender aborts call early
+                        trackCallStatusChanges(currentActiveCallId);
+                    }
+                });
         }
-        btnAudioCall.addEventListener('click', () => runCallSimulation('Audio'));
-        btnVideoCall.addEventListener('click', () => runCallSimulation('Video'));
-        btnEndCall.addEventListener('click', () => callModal.add(callModal.classList.add('hidden')));
 
-        // Realtime loading of Users and Groups (Unified Fix)
+        // 2. Trigger Outbound Call Request Document to Firestore Channel
+        function initiateCallSession(type) {
+            if (isGroupChat || !activeChatUserId) return alert("Select a single contact user to call.");
+
+            const callDocData = {
+                type: type,
+                senderId: currentUser.uid,
+                senderName: currentUser.displayName,
+                senderAvatar: currentUser.photoURL,
+                targetId: activeChatUserId,
+                status: 'dialing',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection('calls').add(callDocData).then(docRef => {
+                currentActiveCallId = docRef.id;
+
+                // Set Up Outgoing Screen Display Mode
+                callUserName.textContent = activeChatName.textContent;
+                callUserImg.src = activeChatAvatar.src;
+                callStatusText.textContent = `Calling ${activeChatName.textContent}...`;
+                callTypeIndicator.textContent = type === 'Video' ? '📹' : '📞';
+
+                incomingCallButtons.classList.add('hidden');
+                btnEndOutgoingCall.classList.remove('hidden');
+                callModal.classList.remove('hidden');
+
+                // Watch live responses from receiver profile target
+                trackCallStatusChanges(currentActiveCallId);
+            });
+        }
+
+        // 3. Track state changes inside active running document session
+        function trackCallStatusChanges(callId) {
+            if (callSessionUnsubscribe) callSessionUnsubscribe();
+
+            callSessionUnsubscribe = db.collection('calls').doc(callId).onSnapshot(doc => {
+                if (!doc.exists) {
+                    closeCallModalUI();
+                    return;
+                }
+                const data = doc.data();
+                if (data.status === 'rejected' || data.status === 'ended') {
+                    callStatusText.textContent = "Call disconnected.";
+                    setTimeout(() => { closeCallModalUI(); }, 1500);
+                } else if (data.status === 'accepted') {
+                    stopRingtoneSound();
+                    callStatusText.textContent = `Connected (Live Encryption Active)`;
+                }
+            });
+        }
+
+        // Button Event Actions for Outgoing and Incoming Actions
+        btnAudioCall.addEventListener('click', () => initiateCallSession('Audio'));
+        btnVideoCall.addEventListener('click', () => initiateCallSession('Video'));
+
+        btnEndOutgoingCall.addEventListener('click', () => {
+            if (currentActiveCallId) {
+                db.collection('calls').doc(currentActiveCallId).update({ status: 'ended' });
+            }
+        });
+
+        btnDeclineIncoming.addEventListener('click', () => {
+            if (currentActiveCallId) {
+                db.collection('calls').doc(currentActiveCallId).update({ status: 'rejected' });
+            }
+        });
+
+        btnAcceptIncoming.addEventListener('click', () => {
+            if (currentActiveCallId) {
+                db.collection('calls').doc(currentActiveCallId).update({ status: 'accepted' });
+            }
+        });
+
+        function closeCallModalUI() {
+            stopRingtoneSound();
+            callModal.classList.add('hidden');
+            if (callSessionUnsubscribe) callSessionUnsubscribe();
+            currentActiveCallId = null;
+        }
+
+
+        /*************************************************************
+         * DATA CHANNELS LOADING AND SIDEBAR INTEGRATION 
+         *************************************************************/
+
         function loadChatsAndGroups() {
             db.collection('users').onSnapshot(userSnapshot => {
                 allUsersCache = [];
@@ -507,23 +666,17 @@
                     renderSidebar(allUsersCache, groupSnapshot);
                     listenToAllIncomingMessages(allUsersCache, groupSnapshot);
                 });
-            }, error => {
-                console.error("Error loading users: ", error);
             });
         }
 
-        // Monitoring incoming messages across all conversations for sound alerts and highlights
         function listenToAllIncomingMessages(users, groupSnapshot) {
-            // Monitor standard room channels
             users.forEach(u => {
                 const rId = currentUser.uid < u.uid ? `${currentUser.uid}_${u.uid}` : `${u.uid}_${currentUser.uid}`;
                 attachRoomListener(rId);
             });
-            // Monitor group chat channels
             groupSnapshot.forEach(gDoc => {
                 attachRoomListener(gDoc.id);
             });
-            setTimeout(() => { initialLoadDone = true; }, 4000);
         }
 
         function attachRoomListener(rId) {
@@ -554,7 +707,6 @@
         function renderSidebar(users, groupSnapshot) {
             usersListContainer.innerHTML = '';
 
-            // 1. Render Groups First
             groupSnapshot.forEach(doc => {
                 const groupData = doc.data();
                 if (!groupData.members.includes(currentUser.uid)) return;
@@ -568,7 +720,7 @@
                         <p class="text-white font-semibold text-sm truncate">${groupData.groupName}</p>
                         <p class="text-[10px] text-indigo-300 truncate">Group: ${groupData.memberNames.join(', ')}</p>
                     </div>
-                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-900 absolute right-3 hidden animate-ping"></span>
+                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 absolute right-3 hidden animate-ping"></span>
                 `;
                 row.addEventListener('click', () => {
                     isGroupChat = true;
@@ -582,7 +734,6 @@
                 usersListContainer.appendChild(row);
             });
 
-            // 2. Render Individual Users
             users.forEach(userData => {
                 const rId = currentUser.uid < userData.uid ? `${currentUser.uid}_${userData.uid}` : `${userData.uid}_${currentUser.uid}`;
                 const row = document.createElement('div');
@@ -593,7 +744,7 @@
                         <p class="text-white font-medium text-sm truncate">${userData.displayName}</p>
                         <p class="text-[10px] text-slate-400 truncate">${userData.bio || 'Click to chat'}</p>
                     </div>
-                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-900 absolute right-3 hidden animate-bounce"></span>
+                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 absolute right-3 hidden animate-bounce"></span>
                 `;
                 row.addEventListener('click', () => {
                     isGroupChat = false;
@@ -615,21 +766,25 @@
             inputAreaContainer.classList.remove('hidden');
             chatColorPicker.classList.remove('hidden');
             btnClearHistory.classList.remove('hidden');
-            callButtonsContainer.classList.remove('hidden');
+
+            if (!isGroupChat) {
+                callButtonsContainer.classList.remove('hidden');
+            } else {
+                callButtonsContainer.classList.add('hidden');
+            }
+
             if (bioText) {
                 activeChatBioContainer.classList.remove('hidden');
                 activeChatBio.textContent = bioText;
             } else {
                 activeChatBioContainer.classList.add('hidden');
             }
-            // Hide sidebar on small screens after choosing a chat
             if (window.innerWidth < 768) {
                 sidebarPanel.classList.add('hidden');
                 sidebarPanel.classList.add('-translate-x-full');
             }
         }
 
-        // Send Chat Message
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -652,7 +807,6 @@
             db.collection('rooms').doc(currentRoomId).collection('messages').add(messageDoc);
         }
 
-        // Load Messages Realtime
         function loadMessages() {
             if (messagesUnsubscribe) messagesUnsubscribe();
 
@@ -671,7 +825,6 @@
                 });
         }
 
-        // Render Individual Message Box with Delete and Forward options
         function renderMessageRow(msgId, msg) {
             if (!msg.createdAt) return;
             const isMe = msg.senderId === currentUser.uid;
@@ -682,7 +835,6 @@
                 ? `<img src="${msg.image}" class="max-w-xs rounded-xl max-h-60 object-cover mt-1 border border-white/10 cursor-pointer" onclick="window.open(this.src)">`
                 : escapeHTML(msg.text);
 
-            // Updated Action Panel: Allows deletion of any incoming/outgoing message inside the channel
             let actionButtons = `
                 <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onclick="forwardMessage('${msgId}', \`${btoa(unescape(encodeURIComponent(msg.text || '')))}\`, '${msg.image || ''}')" class="text-[10px] text-indigo-400 bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:bg-indigo-900/40">Forward ➡️</button>
@@ -704,26 +856,21 @@
             messagesContainer.appendChild(row);
         }
 
-        // Delete Message/Image Functionality (Both Sender and Receiver entries)
         window.deleteMessage = function (msgId) {
-            if (confirm("Are you sure you want to delete this message permanently from this room?")) {
-                db.collection('rooms').doc(currentRoomId).collection('messages').doc(msgId).delete()
-                    .catch(err => alert("Error deleting message: " + err.message));
+            if (confirm("Delete this message?")) {
+                db.collection('rooms').doc(currentRoomId).collection('messages').doc(msgId).delete();
             }
         };
 
-        // Forward Message Functionality
         window.forwardMessage = function (msgId, encodedText, imagePayload) {
             let decodedText = decodeURIComponent(escape(atob(encodedText)));
-            if (allUsersCache.length === 0) return alert("No active users found to forward.");
-
+            if (allUsersCache.length === 0) return alert("No active users found.");
             let targetList = allUsersCache.map((u, i) => `${i + 1}. ${u.displayName}`).join('\n');
-            let choice = prompt(`Select user number to forward this message to:\n\n${targetList}`);
+            let choice = prompt(`Select target contact user number:\n\n${targetList}`);
             if (!choice) return;
 
             let selectedUser = allUsersCache[parseInt(choice) - 1];
-            if (!selectedUser) return alert("Invalid user selected.");
-
+            if (!selectedUser) return alert("Invalid user.");
             let targetRoomId = currentUser.uid < selectedUser.uid ? `${currentUser.uid}_${selectedUser.uid}` : `${selectedUser.uid}_${currentUser.uid}`;
 
             db.collection('rooms').doc(targetRoomId).collection('messages').add({
@@ -733,21 +880,19 @@
                 photoURL: currentUser.photoURL,
                 text: imagePayload ? "[Forwarded Photo]" : `${decodedText} (Forwarded)`,
                 image: imagePayload || null
-            }).then(() => alert("Message Forwarded successfully!"));
+            }).then(() => alert("Message Forwarded!"));
         };
 
-        // Clear Full Chat History Functionality
         btnClearHistory.addEventListener('click', () => {
-            if (confirm("Clear full chat history for this room? This action cannot be undone.")) {
+            if (confirm("Clear chat completely?")) {
                 db.collection('rooms').doc(currentRoomId).collection('messages').get().then(snapshot => {
                     let batch = db.batch();
                     snapshot.forEach(doc => batch.delete(doc.ref));
-                    batch.commit().then(() => alert("Chat history cleared completely!"));
+                    batch.commit().then(() => alert("Cleared!"));
                 });
             }
         });
 
-        // UI Responsive & Menu/Sidebar Toggle Helpers
         btnToggleUsers.addEventListener('click', () => {
             if (sidebarPanel.classList.contains('hidden')) {
                 sidebarPanel.classList.remove('hidden');
