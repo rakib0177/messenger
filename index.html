@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime Premium Chat - Private 1-to-1</title>
-    <!-- Google Fonts & Tailwind CSS for beautiful styling -->
+    <title>praivate messenger</title>
+    <!-- Google Fonts & Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -17,7 +16,6 @@
             height: 100vh;
         }
 
-        /* Premium Glassmorphism Style */
         .glass-panel {
             background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(16px);
@@ -35,7 +33,6 @@
             box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -61,15 +58,11 @@
     <div id="login-screen" class="glass-panel w-full max-w-md rounded-3xl p-8 text-center shadow-2xl mx-4">
         <div
             class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 text-3xl font-bold border border-indigo-500/20">
-            💬
-        </div>
+            💬</div>
         <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Welcome Back</h1>
-        <p class="text-slate-400 mb-8 text-sm">Login with your Gmail account to start chatting privately in real-time.
-        </p>
-
+        <p class="text-slate-400 mb-8 text-sm">Login with your Gmail account to start chatting in real-time.</p>
         <button id="btn-login"
             class="glass-button w-full text-white font-semibold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 shadow-lg">
-            <!-- Google Icon SVG -->
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                 <path
                     d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C17.955 2.192 15.34 1 12.24 1 6.033 1 12.24s5.033 11.24 11.24 11.24c6.478 0 10.793-4.537 10.793-10.99 0-.74-.08-1.3-.175-1.854H12.24z" />
@@ -82,7 +75,7 @@
     <div id="chat-screen"
         class="glass-panel w-full max-w-5xl h-screen md:h-[85vh] md:rounded-3xl shadow-2xl flex hidden overflow-hidden relative">
 
-        <!-- LEFT SIDEBAR: Registered Users List & Profile Bio info -->
+        <!-- LEFT SIDEBAR -->
         <div id="sidebar-panel"
             class="absolute inset-0 z-20 md:relative md:inset-auto w-full md:w-1/3 border-r border-white/10 flex flex-col bg-slate-900 md:bg-slate-900/20 transition-transform duration-300">
             <div class="p-4 border-b border-white/10 bg-white/5 space-y-3">
@@ -95,16 +88,11 @@
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <button id="btn-close-sidebar"
-                            class="md:hidden text-[10px] text-slate-400 border border-white/10 px-2 py-1 rounded-xl bg-white/5">
-                            Back
-                        </button>
+                            class="md:hidden text-[10px] text-slate-400 border border-white/10 px-2 py-1 rounded-xl bg-white/5">Back</button>
                         <button id="btn-logout"
-                            class="text-[10px] font-medium text-slate-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/30 px-2 py-1 rounded-xl transition-all bg-white/5">
-                            Logout
-                        </button>
+                            class="text-[10px] font-medium text-slate-400 hover:text-rose-400 border border-white/10 hover:border-rose-500/30 px-2 py-1 rounded-xl transition-all bg-white/5">Logout</button>
                     </div>
                 </div>
-                <!-- Bio Component Under Profile Profile -->
                 <div class="bg-black/20 rounded-xl p-2.5 text-left border border-white/5">
                     <p
                         class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 mb-1 flex justify-between items-center">
@@ -112,19 +100,22 @@
                         <button id="btn-edit-bio"
                             class="text-white bg-indigo-500/30 hover:bg-indigo-500/50 px-1.5 py-0.5 rounded text-[9px] normal-case transition-all">Edit</button>
                     </p>
-                    <p id="user-bio-text" class="text-xs text-slate-300 italic line-clamp-2">No bio set yet. Click Edit
-                        to add your story.</p>
+                    <p id="user-bio-text" class="text-xs text-slate-300 italic line-clamp-2">No bio set yet.</p>
                 </div>
+                <!-- Group Creation Button -->
+                <button id="btn-create-group"
+                    class="w-full bg-indigo-600/40 hover:bg-indigo-600/60 text-white text-xs py-2 px-3 rounded-xl border border-indigo-500/30 transition-all font-medium">
+                    ➕ Create 4-5 Member Group
+                </button>
             </div>
 
-            <div class="p-3 text-xs font-semibold text-indigo-400 uppercase tracking-wider">Active Users</div>
-            <div id="users-list-container" class="flex-1 overflow-y-auto p-2 space-y-1">
-                <!-- Users loaded here dynamically -->
-            </div>
+            <div class="p-3 text-xs font-semibold text-indigo-400 uppercase tracking-wider">Chats & Groups</div>
+            <div id="users-list-container" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
         </div>
 
-        <!-- RIGHT SIDE: Chat Area Box -->
-        <div class="flex-1 flex flex-col bg-slate-950/10 w-full min-w-0">
+        <!-- RIGHT SIDE: Chat Area -->
+        <div id="chat-main-area"
+            class="flex-1 flex flex-col bg-slate-950/10 w-full min-w-0 transition-all duration-300">
             <!-- Active Chat Header -->
             <div id="chat-header-active"
                 class="px-4 md:px-6 py-3 border-b border-white/10 flex flex-col bg-white/5 gap-2 shrink-0">
@@ -134,21 +125,32 @@
                             class="w-10 h-10 rounded-full border border-white/10 object-cover">
                         <div class="min-w-0">
                             <h2 id="active-chat-name"
-                                class="text-white font-semibold text-sm leading-none mb-1 truncate">Select a user to
-                                start chat</h2>
+                                class="text-white font-semibold text-sm leading-none mb-1 truncate">Select a user/group
+                            </h2>
                             <span id="active-chat-status" class="text-slate-400 text-xs flex items-center gap-1 hidden">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Private Chat
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active Chat
                             </span>
                         </div>
                     </div>
-                    <!-- Toggle Users Button -->
-                    <button id="btn-toggle-users"
-                        class="glass-button text-xs text-white px-3 py-2 rounded-xl font-medium shadow-md">
-                        👥 Users
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <!-- Theme/Color Selector -->
+                        <select id="chat-color-picker"
+                            class="bg-slate-800 text-white text-xs px-2 py-1.5 rounded-xl border border-white/10 focus:outline-none hidden">
+                            <option value="transparent">Default Theme</option>
+                            <option value="rgba(239, 68, 68, 0.2)">🔴 Red Theme</option>
+                            <option value="rgba(0, 0, 0, 0.6)">⚫ Black Theme</option>
+                            <option value="rgba(59, 130, 246, 0.2)">🔵 Blue Theme</option>
+                            <option value="rgba(234, 179, 8, 0.2)">🟡 Yellow Theme</option>
+                            <option value="rgba(236, 72, 153, 0.2)">💗 Pink Theme</option>
+                        </select>
+                        <button id="btn-clear-history"
+                            class="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2 py-1.5 rounded-xl hidden">🗑️
+                            Clear All</button>
+                        <button id="btn-toggle-users"
+                            class="glass-button text-xs text-white px-3 py-2 rounded-xl font-medium shadow-md">👥
+                            Menu</button>
+                    </div>
                 </div>
-
-                <!-- Display Selected Target User's Bio/Story -->
                 <div id="active-chat-bio-container"
                     class="hidden text-left bg-indigo-500/5 rounded-xl px-3 py-1.5 border border-indigo-500/10 flex items-start gap-1.5">
                     <span class="text-xs">📝</span>
@@ -161,34 +163,26 @@
                 <div id="no-chat-selected-placeholder"
                     class="h-full flex flex-col items-center justify-center text-slate-500 text-sm gap-2">
                     <span>💬</span>
-                    <span>Please select a user from the sidebar to view messages.</span>
+                    <span>Please select a chat or group to view messages.</span>
                 </div>
             </div>
 
-            <!-- Input Area with Image Attachment Functionality -->
+            <!-- Input Area -->
             <div id="input-area-container" class="p-4 border-t border-white/10 bg-white/5 hidden shrink-0">
                 <form id="chat-form" class="flex gap-2 items-center">
-                    <!-- Image Input Attachment Hidden -->
                     <input type="file" id="image-attachment-input" accept="image/*" class="hidden">
                     <button type="button" id="btn-attach-image" title="Send a Photo"
-                        class="w-11 h-11 rounded-2xl bg-slate-800 border border-white/10 hover:border-indigo-500/40 text-lg flex items-center justify-center text-slate-300 transition-all shrink-0">
-                        🖼️
-                    </button>
-
-                    <input type="text" id="message-input" autocomplete="off" placeholder="Type a private message..."
+                        class="w-11 h-11 rounded-2xl bg-slate-800 border border-white/10 hover:border-indigo-500/40 text-lg flex items-center justify-center text-slate-300 transition-all shrink-0">🖼️</button>
+                    <input type="text" id="message-input" autocomplete="off" placeholder="Type a message..."
                         class="flex-1 bg-slate-900/40 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50 text-sm transition-all">
-
                     <button type="submit"
-                        class="glass-button text-white px-5 py-3 rounded-2xl font-semibold text-sm shadow-md flex items-center justify-center shrink-0">
-                        Send
-                    </button>
+                        class="glass-button text-white px-5 py-3 rounded-2xl font-semibold text-sm shadow-md flex items-center justify-center shrink-0">Send</button>
                 </form>
             </div>
         </div>
-
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase Legacy SDKs (Compat v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -204,64 +198,63 @@
             measurementId: "G-BTR2FS9EY5"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const provider = new firebase.auth.GoogleAuthProvider();
-
         provider.setCustomParameters({ prompt: 'select_account' });
 
         // DOM Elements
         const loginScreen = document.getElementById('login-screen');
         const chatScreen = document.getElementById('chat-screen');
         const sidebarPanel = document.getElementById('sidebar-panel');
+        const chatMainArea = document.getElementById('chat-main-area');
         const btnLogin = document.getElementById('btn-login');
         const btnLogout = document.getElementById('btn-logout');
         const btnToggleUsers = document.getElementById('btn-toggle-users');
         const btnCloseSidebar = document.getElementById('btn-close-sidebar');
         const btnEditBio = document.getElementById('btn-edit-bio');
+        const btnCreateGroup = document.getElementById('btn-create-group');
+        const btnClearHistory = document.getElementById('btn-clear-history');
+        const chatColorPicker = document.getElementById('chat-color-picker');
         const userAvatar = document.getElementById('user-avatar');
         const userDisplayName = document.getElementById('user-display-name');
         const userBioText = document.getElementById('user-bio-text');
-
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
         const imageAttachmentInput = document.getElementById('image-attachment-input');
         const btnAttachImage = document.getElementById('btn-attach-image');
         const messagesContainer = document.getElementById('messages-container');
         const usersListContainer = document.getElementById('users-list-container');
-
         const activeChatAvatar = document.getElementById('active-chat-avatar');
         const activeChatName = document.getElementById('active-chat-name');
         const activeChatStatus = document.getElementById('active-chat-status');
         const activeChatBioContainer = document.getElementById('active-chat-bio-container');
         const activeChatBio = document.getElementById('active-chat-bio');
         const inputAreaContainer = document.getElementById('input-area-container');
-        const noChatPlaceholder = document.getElementById('no-chat-selected-placeholder');
 
         let currentUser = null;
         let activeChatUserId = null;
+        let isGroupChat = false;
+        let currentRoomId = null;
         let messagesUnsubscribe = null;
+        let allUsersCache = [];
 
-        // Auth State Observer
+        // Auth Observer
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
                 loginScreen.classList.add('hidden');
                 chatScreen.classList.remove('hidden');
-
                 userAvatar.src = user.photoURL || 'https://via.placeholder.com/150';
                 userDisplayName.textContent = user.displayName;
 
-                // Sync basic info, keep existing bio safe if already present
                 db.collection('users').doc(user.uid).get().then(docSnapshot => {
                     let defaultBio = "Hello! I am using Realtime Premium Chat.";
                     if (docSnapshot.exists && docSnapshot.data().bio) {
                         defaultBio = docSnapshot.data().bio;
                     }
                     userBioText.textContent = defaultBio;
-
                     db.collection('users').doc(user.uid).set({
                         uid: user.uid,
                         displayName: user.displayName,
@@ -270,15 +263,9 @@
                         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
                 });
-
-                loadUsersList();
-
-                if (window.innerWidth < 768) {
-                    sidebarPanel.classList.remove('hidden');
-                }
+                loadChatsAndGroups();
             } else {
                 currentUser = null;
-                activeChatUserId = null;
                 if (messagesUnsubscribe) messagesUnsubscribe();
                 chatScreen.classList.add('hidden');
                 loginScreen.classList.remove('hidden');
@@ -286,260 +273,296 @@
             }
         });
 
-        // Login Function
         btnLogin.addEventListener('click', () => {
             auth.signInWithPopup(provider).catch(error => {
-                console.error("Popup Error, trying redirect mode...", error.message);
                 if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
                     auth.signInWithRedirect(provider);
-                } else {
-                    alert("Login failed! " + error.message);
-                }
+                } else { alert("Login failed! " + error.message); }
             });
         });
 
-        // Logout Function
-        btnLogout.addEventListener('click', () => {
-            auth.signOut();
-        });
+        btnLogout.addEventListener('click', () => auth.signOut());
 
-        // Edit My Story / Bio Function
         btnEditBio.addEventListener('click', () => {
             const currentBio = userBioText.textContent;
-            const newBio = prompt("Write your short Bio or Story (Everyone can see this):", currentBio);
+            const newBio = prompt("Write your short Bio:", currentBio);
             if (newBio !== null && newBio.trim() !== "") {
-                const cleanBio = newBio.trim();
-                userBioText.textContent = cleanBio;
-                db.collection('users').doc(currentUser.uid).update({
-                    bio: cleanBio
-                }).catch(err => console.error("Error saving bio: ", err));
+                userBioText.textContent = newBio.trim();
+                db.collection('users').doc(currentUser.uid).update({ bio: newBio.trim() });
             }
         });
 
-        // Trigger Hidden File Input for Images
-        btnAttachImage.addEventListener('click', () => {
-            imageAttachmentInput.click();
+        // Background Color Picker
+        chatColorPicker.addEventListener('change', (e) => {
+            chatMainArea.style.backgroundColor = e.target.value;
         });
 
-        // Handle Image selection and compression/conversion to Base64
+        // Image Attachment
+        btnAttachImage.addEventListener('click', () => imageAttachmentInput.click());
         imageAttachmentInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file || !activeChatUserId) return;
-
-            if (!file.type.startsWith('image/')) {
-                alert('Please select a valid image file.');
-                return;
-            }
-
-            // Check if image size is larger than 1.5MB to save firestore space
-            if (file.size > 1500000) {
-                alert('Image is too large. Please select a photo below 1.5MB.');
-                return;
-            }
+            if (!file || !currentRoomId) return;
+            if (!file.type.startsWith('image/')) return alert('Please select an image file.');
+            if (file.size > 1000000) return alert('Image size must be under 1MB.');
 
             const reader = new FileReader();
             reader.onload = function (event) {
-                const base64Data = event.target.result;
-                sendChatMessage(null, base64Data); // Send with image payload
+                sendChatMessage(null, event.target.result);
             };
             reader.readAsDataURL(file);
-
-            // Clear standard value so same file can be triggered again
             e.target.value = '';
         });
 
-        // Toggle Sidebar Layout
-        btnToggleUsers.addEventListener('click', () => {
-            sidebarPanel.classList.toggle('hidden');
+        // Create 4-5 Member Group
+        btnCreateGroup.addEventListener('click', () => {
+            if (allUsersCache.length < 3) {
+                return alert("Not enough users registered to create a 4-5 member group.");
+            }
+            let userOptions = allUsersCache.map((u, index) => `${index + 1}. ${u.displayName}`).join('\n');
+            let selections = prompt(`Enter user numbers separated by comma (e.g., 1,2,3) to add to group:\n\n${userOptions}`);
+
+            if (!selections) return;
+            let indices = selections.split(',').map(num => parseInt(num.trim()) - 1);
+            let selectedMembers = [currentUser.uid];
+            let memberNames = [currentUser.displayName];
+
+            indices.forEach(idx => {
+                if (allUsersCache[idx]) {
+                    selectedMembers.push(allUsersCache[idx].uid);
+                    memberNames.push(allUsersCache[idx].displayName);
+                }
+            });
+
+            if (selectedMembers.length < 3 || selectedMembers.length > 6) {
+                return alert("Group must have between 3 to 5 extra members (Total 4-6 members).");
+            }
+
+            let groupName = prompt("Enter a name for your new Group:");
+            if (!groupName || groupName.trim() === "") groupName = "Premium Power Group";
+
+            db.collection('rooms').add({
+                isGroup: true,
+                groupName: groupName.trim(),
+                members: selectedMembers,
+                memberNames: memberNames,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: currentUser.uid
+            }).then(() => alert("Group Created Successfully!"));
         });
 
-        btnCloseSidebar.addEventListener('click', () => {
-            sidebarPanel.classList.add('hidden');
-        });
-
-        // Reset right side screen state
-        function resetChatArea() {
-            activeChatUserId = null;
-            activeChatName.textContent = "Select a user to start chat";
-            activeChatAvatar.src = "https://via.placeholder.com/150";
-            activeChatStatus.classList.add('hidden');
-            activeChatBioContainer.classList.add('hidden');
-            inputAreaContainer.classList.add('hidden');
-            messagesContainer.innerHTML = `
-                <div id="no-chat-selected-placeholder" class="h-full flex flex-col items-center justify-center text-slate-500 text-sm gap-2">
-                    <span>💬</span>
-                    <span>Please select a user from the sidebar to view messages.</span>
-                </div>
-            `;
-        }
-
-        // Load Registered Users List Realtime
-        function loadUsersList() {
-            db.collection('users').onSnapshot(snapshot => {
-                usersListContainer.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    if (userData.uid === currentUser.uid) return;
-
-                    const userRow = document.createElement('div');
-                    userRow.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 ${activeChatUserId === userData.uid ? 'bg-white/10 border border-white/10' : ''}`;
-                    userRow.innerHTML = `
-                        <img src="${userData.photoURL || 'https://via.placeholder.com/150'}" alt="${userData.displayName}" class="w-9 h-9 rounded-full border border-white/10 object-cover shrink-0">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-white font-medium text-sm truncate">${userData.displayName}</p>
-                            <p class="text-[10px] text-indigo-300 truncate">${userData.bio ? userData.bio : 'Click to chat'}</p>
-                        </div>
-                    `;
-
-                    userRow.addEventListener('click', () => {
-                        selectUserForChat(userData);
-                        if (window.innerWidth < 768) {
-                            sidebarPanel.classList.add('hidden');
-                        }
-                    });
-
-                    usersListContainer.appendChild(userRow);
+        // Realtime loading of Users and Groups
+        function loadChatsAndGroups() {
+            // Load Users First
+            db.collection('users').onSnapshot(userSnapshot => {
+                allUsersCache = [];
+                userSnapshot.forEach(doc => {
+                    if (doc.data().uid !== currentUser.uid) allUsersCache.push(doc.data());
                 });
-            }, error => {
-                console.error("Users list load error: ", error);
+
+                // Load Groups and Render unified list
+                db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
+                    renderSidebar(allUsersCache, groupSnapshot);
+                });
             });
         }
 
-        // Select User and setup Room & Display Bio
-        function selectUserForChat(targetUser) {
-            activeChatUserId = targetUser.uid;
-            activeChatName.textContent = targetUser.displayName;
-            activeChatAvatar.src = targetUser.photoURL || 'https://via.placeholder.com/150';
+        function renderSidebar(users, groupSnapshot) {
+            usersListContainer.innerHTML = '';
+
+            // Render Groups First
+            groupSnapshot.forEach(doc => {
+                const groupData = doc.data();
+                if (!groupData.members.includes(currentUser.uid)) return;
+
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-indigo-500/10 border border-indigo-500/20 mb-1 bg-indigo-950/20`;
+                row.innerHTML = `
+                    <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white text-lg font-bold shrink-0">👥</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-semibold text-sm truncate">${groupData.groupName}</p>
+                        <p class="text-[10px] text-indigo-300 truncate">Group: ${groupData.memberNames.join(', ')}</p>
+                    </div>
+                `;
+                row.addEventListener('click', () => {
+                    isGroupChat = true;
+                    activeChatUserId = null;
+                    currentRoomId = doc.id;
+                    setupChatUI(groupData.groupName, 'https://via.placeholder.com/150', `Members: ${groupData.memberNames.length}`);
+                    loadMessages();
+                });
+                usersListContainer.appendChild(row);
+            });
+
+            // Render Individual Users
+            users.forEach(userData => {
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5`;
+                row.innerHTML = `
+                    <img src="${userData.photoURL || 'https://via.placeholder.com/150'}" class="w-9 h-9 rounded-full border border-white/10 object-cover shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium text-sm truncate">${userData.displayName}</p>
+                        <p class="text-[10px] text-slate-400 truncate">${userData.bio || 'Click to chat'}</p>
+                    </div>
+                `;
+                row.addEventListener('click', () => {
+                    isGroupChat = false;
+                    activeChatUserId = userData.uid;
+                    currentRoomId = currentUser.uid < userData.uid ? `${currentUser.uid}_${userData.uid}` : `${userData.uid}_${currentUser.uid}`;
+                    setupChatUI(userData.displayName, userData.photoURL, userData.bio);
+                    loadMessages();
+                });
+                usersListContainer.appendChild(row);
+            });
+        }
+
+        function setupChatUI(title, avatarSrc, bioText) {
+            activeChatName.textContent = title;
+            activeChatAvatar.src = avatarSrc || 'https://via.placeholder.com/150';
             activeChatStatus.classList.remove('hidden');
             inputAreaContainer.classList.remove('hidden');
-
-            // Show active bio card details if they have any text saved
-            if (targetUser.bio) {
+            chatColorPicker.classList.remove('hidden');
+            btnClearHistory.classList.remove('hidden');
+            if (bioText) {
                 activeChatBioContainer.classList.remove('hidden');
-                activeChatBio.textContent = targetUser.bio;
+                activeChatBio.textContent = bioText;
             } else {
                 activeChatBioContainer.classList.add('hidden');
             }
-
-            // Highlighting inside room row switcher
-            const elements = usersListContainer.querySelectorAll('.cursor-pointer');
-            elements.forEach(el => el.classList.remove('bg-white/10', 'border', 'border-white/10'));
-
-            const chatRoomId = currentUser.uid < targetUser.uid
-                ? `${currentUser.uid}_${targetUser.uid}`
-                : `${targetUser.uid}_${currentUser.uid}`;
-
-            loadPrivateMessages(chatRoomId);
+            if (window.innerWidth < 768) sidebarPanel.classList.add('hidden');
         }
 
-        // Main Messaging Handling Function for both Image & Text
-        function sendChatMessage(textPayload, imagePayload = null) {
-            if (!activeChatUserId) return;
-
-            const chatRoomId = currentUser.uid < activeChatUserId
-                ? `${currentUser.uid}_${activeChatUserId}`
-                : `${activeChatUserId}_${currentUser.uid}`;
-
-            const messageDoc = {
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                senderId: currentUser.uid,
-                receiverId: activeChatUserId,
-                displayName: currentUser.displayName,
-                photoURL: currentUser.photoURL
-            };
-
-            if (imagePayload) {
-                messageDoc.image = imagePayload;
-                messageDoc.text = "[Photo Attachment]";
-            } else {
-                messageDoc.text = textPayload;
-            }
-
-            db.collection('rooms').doc(chatRoomId).collection('messages').add(messageDoc)
-                .catch(err => {
-                    console.error("Database Write Error: ", err);
-                    alert("Message send failed. Please verify your firestore configuration.");
-                });
-        }
-
-        // Chat Form Submission
+        // Send Chat Message
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
             if (!text) return;
-
             sendChatMessage(text, null);
             messageInput.value = '';
         });
 
-        // Load Private Messages Realtime
-        function loadPrivateMessages(chatRoomId) {
+        function sendChatMessage(textPayload, imagePayload = null) {
+            if (!currentRoomId) return;
+            const messageDoc = {
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                senderId: currentUser.uid,
+                displayName: currentUser.displayName,
+                photoURL: currentUser.photoURL,
+                text: imagePayload ? "[Photo Attachment]" : textPayload,
+                image: imagePayload || null
+            };
+
+            db.collection('rooms').doc(currentRoomId).collection('messages').add(messageDoc);
+        }
+
+        // Load Messages Realtime
+        function loadMessages() {
             if (messagesUnsubscribe) messagesUnsubscribe();
 
-            messagesUnsubscribe = db.collection('rooms').doc(chatRoomId).collection('messages')
-                .orderBy('createdAt', 'asc')
-                .limitToLast(50)
+            messagesUnsubscribe = db.collection('rooms').doc(currentRoomId).collection('messages')
+                .orderBy('createdAt', 'asc').limitToLast(100)
                 .onSnapshot(snapshot => {
                     messagesContainer.innerHTML = '';
-
                     if (snapshot.empty) {
-                        messagesContainer.innerHTML = `
-                            <div class="h-full flex flex-col items-center justify-center text-slate-500 text-xs text-center p-4">
-                                🔒 Secure encryption loaded. Say hello to start this private conversation!
-                            </div>
-                        `;
+                        messagesContainer.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-500 text-xs text-center p-4">🔒 Start conversation safely!</div>`;
                         return;
                     }
-
                     snapshot.forEach(doc => {
-                        const message = doc.data();
-                        renderMessage(message);
+                        renderMessageRow(doc.id, doc.data());
                     });
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }, error => {
-                    console.error("Private room access denied: ", error);
-                    messagesContainer.innerHTML = `<div class="text-rose-400 p-4 text-center text-xs">Failed to load chat history. Check security rules.</div>`;
                 });
         }
 
-        // Render Message Row (Handles Text Blocks & Dynamic Image Tags securely)
-        function renderMessage(msg) {
+        // Render Individual Message Box with Delete and Forward options
+        function renderMessageRow(msgId, msg) {
             if (!msg.createdAt) return;
             const isMe = msg.senderId === currentUser.uid;
-            const messageRow = document.createElement('div');
-            messageRow.className = `flex items-end gap-2.5 ${isMe ? 'justify-end' : 'justify-start'}`;
+            const row = document.createElement('div');
+            row.className = `flex items-end gap-2.5 ${isMe ? 'justify-end' : 'justify-start'} group`;
 
-            const avatarHtml = `<img src="${msg.photoURL || 'https://via.placeholder.com/150'}" alt="${msg.displayName}" class="w-7 h-7 rounded-full border border-white/10 object-cover shrink-0">`;
+            let bodyContent = msg.image
+                ? `<img src="${msg.image}" class="max-w-xs rounded-xl max-h-60 object-cover mt-1 border border-white/10 cursor-pointer" onclick="window.open(this.src)">`
+                : escapeHTML(msg.text);
 
-            // Conditional block structure to see if message contains an image property key
-            let internalBodyContent = '';
-            if (msg.image) {
-                internalBodyContent = `<img src="${msg.image}" class="max-w-xs rounded-xl shadow-inner max-h-60 object-cover mt-1 border border-white/10 cursor-pointer" onclick="window.open(this.src)" title="Click to view full image" alt="shared photo">`;
-            } else {
-                internalBodyContent = escapeHTML(msg.text);
-            }
-
-            const messageContentHtml = `
-                <div class="flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}">
-                    <span class="text-[10px] text-slate-400 px-1 mb-1">${msg.displayName}</span>
-                    <div class="px-4 py-2.5 rounded-2xl text-sm break-all ${isMe
-                    ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white rounded-br-none shadow-md'
-                    : 'bg-white/10 text-slate-200 rounded-bl-none border border-white/5'
-                }">
-                        ${internalBodyContent}
-                    </div>
+            // Dynamic Action Panel (Delete/Forward)
+            let actionButtons = `
+                <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="forwardMessage('${msgId}', \`${btoa(unescape(encodeURIComponent(msg.text)))}\`, '${msg.image || ''}')" class="text-[10px] text-indigo-400 bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:bg-indigo-900/40">Forward ➡️</button>
+                    ${isMe ? `<button onclick="deleteMessage('${msgId}')" class="text-[10px] text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-500/20 hover:bg-rose-900/40">Delete 🗑️</button>` : ''}
                 </div>
             `;
 
-            messageRow.innerHTML = isMe ? (messageContentHtml + avatarHtml) : (avatarHtml + messageContentHtml);
-            messagesContainer.appendChild(messageRow);
+            row.innerHTML = `
+                ${!isMe ? `<img src="${msg.photoURL || 'https://via.placeholder.com/150'}" class="w-7 h-7 rounded-full object-cover border border-white/10">` : ''}
+                <div class="flex flex-col max-w-[70%] ${isMe ? 'items-end' : 'items-start'}">
+                    <span class="text-[9px] text-slate-400 mb-0.5 px-1">${msg.displayName}</span>
+                    <div class="px-3.5 py-2 rounded-2xl text-xs break-all ${isMe ? 'bg-gradient-to-tr from-indigo-500 to-purple-500 text-white rounded-br-none' : 'bg-white/10 text-slate-200 rounded-bl-none border border-white/5'}">
+                        ${bodyContent}
+                    </div>
+                    ${actionButtons}
+                </div>
+                ${isMe ? `<img src="${msg.photoURL || 'https://via.placeholder.com/150'}" class="w-7 h-7 rounded-full object-cover border border-white/10">` : ''}
+            `;
+            messagesContainer.appendChild(row);
         }
 
-        // Security Helper to prevent XSS injection
+        // Delete Single Message/Image Functionality
+        window.deleteMessage = function (msgId) {
+            if (confirm("Are you sure you want to delete this message/image permanently?")) {
+                db.collection('rooms').doc(currentRoomId).collection('messages').doc(msgId).delete()
+                    .catch(err => alert("Error deleting message: " + err.message));
+            }
+        };
+
+        // Forward Message Functionality
+        window.forwardMessage = function (msgId, encodedText, imagePayload) {
+            let decodedText = decodeURIComponent(escape(atob(encodedText)));
+            if (allUsersCache.length === 0) return alert("No active users found to forward.");
+
+            let targetList = allUsersCache.map((u, i) => `${i + 1}. ${u.displayName}`).join('\n');
+            let choice = prompt(`Select user number to forward this message to:\n\n${targetList}`);
+            if (!choice) return;
+
+            let selectedUser = allUsersCache[parseInt(choice) - 1];
+            if (!selectedUser) return alert("Invalid user selected.");
+
+            let targetRoomId = currentUser.uid < selectedUser.uid ? `${currentUser.uid}_${selectedUser.uid}` : `${selectedUser.uid}_${currentUser.uid}`;
+
+            db.collection('rooms').doc(targetRoomId).collection('messages').add({
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                senderId: currentUser.uid,
+                displayName: currentUser.displayName,
+                photoURL: currentUser.photoURL,
+                text: imagePayload ? "[Forwarded Photo]" : `${decodedText} (Forwarded)`,
+                image: imagePayload || null
+            }).then(() => alert("Message Forwarded successfully!"));
+        };
+
+        // Clear Full Chat History Functionality
+        btnClearHistory.addEventListener('click', () => {
+            if (confirm("Clear full chat history for this room? This action cannot be undone.")) {
+                db.collection('rooms').doc(currentRoomId).collection('messages').get().then(snapshot => {
+                    let batch = db.batch();
+                    snapshot.forEach(doc => batch.delete(doc.ref));
+                    batch.commit().then(() => alert("Chat history cleared completely!"));
+                });
+            }
+        });
+
+        // UI Responsive Helpers
+        btnToggleUsers.addEventListener('click', () => sidebarPanel.classList.toggle('hidden'));
+        btnCloseSidebar.addEventListener('click', () => sidebarPanel.classList.add('hidden'));
+
+        function resetChatArea() {
+            currentRoomId = null;
+            activeChatName.textContent = "Select a user/group";
+            inputAreaContainer.classList.add('hidden');
+            chatColorPicker.classList.add('hidden');
+            btnClearHistory.classList.add('hidden');
+        }
+
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g,
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
     </script>
 </body>
