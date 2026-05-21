@@ -86,6 +86,8 @@
                             class="w-8 h-8 rounded-full border border-indigo-500/30 object-cover shrink-0">
                         <span id="user-display-name"
                             class="text-white font-semibold text-xs truncate max-w-[120px]">Loading...</span>
+                        <button id="btn-edit-profile" title="Change Name/Avatar"
+                            class="text-slate-400 hover:text-white text-xs">⚙️</button>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <button id="btn-close-sidebar"
@@ -121,9 +123,10 @@
             <div id="chat-header-active"
                 class="px-4 md:px-6 py-3 border-b border-white/10 flex flex-col bg-white/5 gap-2 shrink-0">
                 <div class="flex items-center justify-between min-w-0">
-                    <div class="flex items-center gap-3 min-w-0">
+                    <div class="flex items-center gap-3 min-w-0 cursor-pointer" id="active-chat-profile-trigger"
+                        title="Click to view profile">
                         <img id="active-chat-avatar" src="https://via.placeholder.com/150" alt="Avatar"
-                            class="w-10 h-10 rounded-full border border-white/10 object-cover">
+                            class="w-10 h-10 rounded-full border border-white/10 object-cover hover:scale-105 transition-transform">
                         <div class="min-w-0">
                             <h2 id="active-chat-name"
                                 class="text-white font-semibold text-sm leading-none mb-1 truncate">Select a user/group
@@ -134,6 +137,13 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
+                        <!-- Calling Buttons -->
+                        <div id="call-buttons-container" class="flex items-center gap-1 mr-2 hidden">
+                            <button id="btn-audio-call" title="Audio Call"
+                                class="p-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/40 transition-all text-xs">📞</button>
+                            <button id="btn-video-call" title="Video Call"
+                                class="p-2 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl hover:bg-indigo-500/40 transition-all text-xs">📹</button>
+                        </div>
                         <!-- Theme/Color Selector -->
                         <select id="chat-color-picker"
                             class="bg-slate-800 text-white text-xs px-2 py-1.5 rounded-xl border border-white/10 focus:outline-none hidden">
@@ -183,6 +193,45 @@
         </div>
     </div>
 
+    <!-- PROFILE VIEW POPUP MODAL -->
+    <div id="profile-modal"
+        class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden p-4 backdrop-blur-md">
+        <div class="glass-panel max-w-sm w-full rounded-3xl p-6 text-center relative text-white">
+            <button id="btn-close-profile-modal"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+            <img id="modal-profile-img" src=""
+                class="w-28 h-28 rounded-full mx-auto object-cover border-2 border-indigo-500/50 mb-4 shadow-xl">
+            <h3 id="modal-profile-name" class="text-xl font-bold tracking-tight mb-1">Name</h3>
+            <p id="modal-profile-type" class="text-indigo-400 font-medium text-xs mb-4">User Profile</p>
+            <div class="bg-black/30 p-3 rounded-xl border border-white/5 text-left">
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">About /
+                    Biography</span>
+                <p id="modal-profile-bio" class="text-sm text-slate-200 italic break-words">No Bio</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALL INTERFACE MODAL -->
+    <div id="call-modal"
+        class="fixed inset-0 bg-slate-950/90 z-50 flex flex-col items-center justify-center hidden text-white p-4 animate-fade-in">
+        <div class="text-center space-y-6 max-w-sm w-full">
+            <div class="relative inline-block">
+                <img id="call-user-img" src="https://via.placeholder.com/150"
+                    class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 animate-pulse mx-auto">
+                <div class="absolute bottom-1 right-2 bg-emerald-500 w-5 h-5 rounded-full border-4 border-slate-950">
+                </div>
+            </div>
+            <div>
+                <h3 id="call-user-name" class="text-2xl font-bold">User Name</h3>
+                <p id="call-status-text" class="text-indigo-400 text-sm mt-1 animate-bounce">Ringing...</p>
+            </div>
+            <div class="flex justify-center gap-6 pt-8">
+                <button id="btn-end-call"
+                    class="w-14 h-14 bg-rose-500 hover:bg-rose-600 rounded-full flex items-center justify-center text-xl shadow-lg transition-transform hover:scale-110">🤙</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Legacy SDKs (Compat v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -205,6 +254,25 @@
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
+        // HTML5 Audio Context Setup for Notification Sound
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playNotificationSound() {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 Note
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); // A5 Note
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) { console.log("Audio play blocked"); }
+        }
+
         // DOM Elements
         const loginScreen = document.getElementById('login-screen');
         const chatScreen = document.getElementById('chat-screen');
@@ -215,6 +283,7 @@
         const btnToggleUsers = document.getElementById('btn-toggle-users');
         const btnCloseSidebar = document.getElementById('btn-close-sidebar');
         const btnEditBio = document.getElementById('btn-edit-bio');
+        const btnEditProfile = document.getElementById('btn-edit-profile');
         const btnCreateGroup = document.getElementById('btn-create-group');
         const btnClearHistory = document.getElementById('btn-clear-history');
         const chatColorPicker = document.getElementById('chat-color-picker');
@@ -233,6 +302,24 @@
         const activeChatBioContainer = document.getElementById('active-chat-bio-container');
         const activeChatBio = document.getElementById('active-chat-bio');
         const inputAreaContainer = document.getElementById('input-area-container');
+        const callButtonsContainer = document.getElementById('call-buttons-container');
+        const btnAudioCall = document.getElementById('btn-audio-call');
+        const btnVideoCall = document.getElementById('btn-video-call');
+
+        // Modal Modals
+        const profileModal = document.getElementById('profile-modal');
+        const btnCloseProfileModal = document.getElementById('btn-close-profile-modal');
+        const modalProfileImg = document.getElementById('modal-profile-img');
+        const modalProfileName = document.getElementById('modal-profile-name');
+        const modalProfileBio = document.getElementById('modal-profile-bio');
+        const modalProfileType = document.getElementById('modal-profile-type');
+        const activeChatProfileTrigger = document.getElementById('active-chat-profile-trigger');
+
+        const callModal = document.getElementById('call-modal');
+        const callUserImg = document.getElementById('call-user-img');
+        const callUserName = document.getElementById('call-user-name');
+        const callStatusText = document.getElementById('call-status-text');
+        const btnEndCall = document.getElementById('btn-end-call');
 
         let currentUser = null;
         let activeChatUserId = null;
@@ -240,6 +327,8 @@
         let currentRoomId = null;
         let messagesUnsubscribe = null;
         let allUsersCache = [];
+        let roomLastMessageTimes = {};
+        let initialLoadDone = false;
 
         // Auth Observer
         auth.onAuthStateChanged(user => {
@@ -290,6 +379,28 @@
             if (newBio !== null && newBio.trim() !== "") {
                 userBioText.textContent = newBio.trim();
                 db.collection('users').doc(currentUser.uid).update({ bio: newBio.trim() });
+            }
+        });
+
+        // Edit Profile Name and Picture URL Function
+        btnEditProfile.addEventListener('click', () => {
+            const newName = prompt("Enter new display name:", currentUser.displayName);
+            if (!newName || newName.trim() === "") return;
+            const newPhotoURL = prompt("Enter profile picture URL:", currentUser.photoURL || "");
+
+            if (newName.trim() !== "") {
+                currentUser.updateProfile({
+                    displayName: newName.trim(),
+                    photoURL: newPhotoURL ? newPhotoURL.trim() : currentUser.photoURL
+                }).then(() => {
+                    userDisplayName.textContent = newName.trim();
+                    if (newPhotoURL) userAvatar.src = newPhotoURL.trim();
+                    db.collection('users').doc(currentUser.uid).update({
+                        displayName: newName.trim(),
+                        photoURL: newPhotoURL ? newPhotoURL.trim() : currentUser.photoURL
+                    });
+                    alert("Profile updated successfully!");
+                }).catch(err => alert("Error updating profile: " + err.message));
             }
         });
 
@@ -351,6 +462,37 @@
             }).then(() => alert("Group Created Successfully!"));
         });
 
+        // Profile View Logic
+        activeChatProfileTrigger.addEventListener('click', () => {
+            if (!currentRoomId) return;
+            modalProfileName.textContent = activeChatName.textContent;
+            modalProfileImg.src = activeChatAvatar.src;
+            if (isGroupChat) {
+                modalProfileType.textContent = "Group Conversation";
+                modalProfileBio.textContent = activeChatBio.textContent || "No summary config available for this group.";
+            } else {
+                modalProfileType.textContent = "Private Contact";
+                modalProfileBio.textContent = activeChatBio.textContent || "No description / bio added by user.";
+            }
+            profileModal.classList.remove('hidden');
+        });
+        btnCloseProfileModal.addEventListener('click', () => profileModal.classList.add('hidden'));
+
+        // Calling UI Trigger Simulation
+        function runCallSimulation(type) {
+            callUserName.textContent = activeChatName.textContent;
+            callUserImg.src = activeChatAvatar.src;
+            callStatusText.textContent = `Establishing ${type} Connection...`;
+            callModal.classList.remove('hidden');
+
+            setTimeout(() => {
+                callStatusText.textContent = `On Live ${type} Call (Encrypted)`;
+            }, 2500);
+        }
+        btnAudioCall.addEventListener('click', () => runCallSimulation('Audio'));
+        btnVideoCall.addEventListener('click', () => runCallSimulation('Video'));
+        btnEndCall.addEventListener('click', () => callModal.add(callModal.classList.add('hidden')));
+
         // Realtime loading of Users and Groups (Unified Fix)
         function loadChatsAndGroups() {
             db.collection('users').onSnapshot(userSnapshot => {
@@ -363,10 +505,50 @@
 
                 db.collection('rooms').where('isGroup', '==', true).onSnapshot(groupSnapshot => {
                     renderSidebar(allUsersCache, groupSnapshot);
+                    listenToAllIncomingMessages(allUsersCache, groupSnapshot);
                 });
             }, error => {
                 console.error("Error loading users: ", error);
             });
+        }
+
+        // Monitoring incoming messages across all conversations for sound alerts and highlights
+        function listenToAllIncomingMessages(users, groupSnapshot) {
+            // Monitor standard room channels
+            users.forEach(u => {
+                const rId = currentUser.uid < u.uid ? `${currentUser.uid}_${u.uid}` : `${u.uid}_${currentUser.uid}`;
+                attachRoomListener(rId);
+            });
+            // Monitor group chat channels
+            groupSnapshot.forEach(gDoc => {
+                attachRoomListener(gDoc.id);
+            });
+            setTimeout(() => { initialLoadDone = true; }, 4000);
+        }
+
+        function attachRoomListener(rId) {
+            if (window[rId + '_listener']) return;
+            window[rId + '_listener'] = true;
+
+            db.collection('rooms').doc(rId).collection('messages')
+                .orderBy('createdAt', 'desc').limit(1)
+                .onSnapshot(snap => {
+                    if (!snap.empty) {
+                        const mDoc = snap.docs[0].data();
+                        const mTime = mDoc.createdAt ? mDoc.createdAt.toMillis() : null;
+
+                        if (mTime && roomLastMessageTimes[rId] && mTime > roomLastMessageTimes[rId]) {
+                            if (mDoc.senderId !== currentUser.uid) {
+                                playNotificationSound();
+                                if (currentRoomId !== rId) {
+                                    const badge = document.getElementById(`badge-${rId}`);
+                                    if (badge) badge.classList.remove('hidden');
+                                }
+                            }
+                        }
+                        if (mTime) roomLastMessageTimes[rId] = mTime;
+                    }
+                });
         }
 
         function renderSidebar(users, groupSnapshot) {
@@ -376,20 +558,24 @@
             groupSnapshot.forEach(doc => {
                 const groupData = doc.data();
                 if (!groupData.members.includes(currentUser.uid)) return;
+                const rId = doc.id;
 
                 const row = document.createElement('div');
-                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-indigo-500/10 border border-indigo-500/20 mb-1 bg-indigo-950/20`;
+                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-indigo-500/10 border border-indigo-500/20 mb-1 bg-indigo-950/20 relative`;
                 row.innerHTML = `
                     <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white text-lg font-bold shrink-0">👥</div>
                     <div class="flex-1 min-w-0">
                         <p class="text-white font-semibold text-sm truncate">${groupData.groupName}</p>
                         <p class="text-[10px] text-indigo-300 truncate">Group: ${groupData.memberNames.join(', ')}</p>
                     </div>
+                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-900 absolute right-3 hidden animate-ping"></span>
                 `;
                 row.addEventListener('click', () => {
                     isGroupChat = true;
                     activeChatUserId = null;
-                    currentRoomId = doc.id;
+                    currentRoomId = rId;
+                    const b = document.getElementById(`badge-${rId}`);
+                    if (b) b.classList.add('hidden');
                     setupChatUI(groupData.groupName, 'https://via.placeholder.com/150', `Members: ${groupData.memberNames.length}`);
                     loadMessages();
                 });
@@ -398,19 +584,23 @@
 
             // 2. Render Individual Users
             users.forEach(userData => {
+                const rId = currentUser.uid < userData.uid ? `${currentUser.uid}_${userData.uid}` : `${userData.uid}_${currentUser.uid}`;
                 const row = document.createElement('div');
-                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5`;
+                row.className = `flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:bg-white/5 relative`;
                 row.innerHTML = `
                     <img src="${userData.photoURL || 'https://via.placeholder.com/150'}" class="w-9 h-9 rounded-full border border-white/10 object-cover shrink-0">
                     <div class="flex-1 min-w-0">
                         <p class="text-white font-medium text-sm truncate">${userData.displayName}</p>
                         <p class="text-[10px] text-slate-400 truncate">${userData.bio || 'Click to chat'}</p>
                     </div>
+                    <span id="badge-${rId}" class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-slate-900 absolute right-3 hidden animate-bounce"></span>
                 `;
                 row.addEventListener('click', () => {
                     isGroupChat = false;
                     activeChatUserId = userData.uid;
-                    currentRoomId = currentUser.uid < userData.uid ? `${currentUser.uid}_${userData.uid}` : `${userData.uid}_${currentUser.uid}`;
+                    currentRoomId = rId;
+                    const b = document.getElementById(`badge-${rId}`);
+                    if (b) b.classList.add('hidden');
                     setupChatUI(userData.displayName, userData.photoURL, userData.bio);
                     loadMessages();
                 });
@@ -425,6 +615,7 @@
             inputAreaContainer.classList.remove('hidden');
             chatColorPicker.classList.remove('hidden');
             btnClearHistory.classList.remove('hidden');
+            callButtonsContainer.classList.remove('hidden');
             if (bioText) {
                 activeChatBioContainer.classList.remove('hidden');
                 activeChatBio.textContent = bioText;
@@ -491,11 +682,11 @@
                 ? `<img src="${msg.image}" class="max-w-xs rounded-xl max-h-60 object-cover mt-1 border border-white/10 cursor-pointer" onclick="window.open(this.src)">`
                 : escapeHTML(msg.text);
 
-            // Dynamic Action Panel (Delete/Forward)
+            // Updated Action Panel: Allows deletion of any incoming/outgoing message inside the channel
             let actionButtons = `
                 <div class="flex gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onclick="forwardMessage('${msgId}', \`${btoa(unescape(encodeURIComponent(msg.text || '')))}\`, '${msg.image || ''}')" class="text-[10px] text-indigo-400 bg-indigo-950/40 px-1.5 py-0.5 rounded border border-indigo-500/20 hover:bg-indigo-900/40">Forward ➡️</button>
-                    ${isMe ? `<button onclick="deleteMessage('${msgId}')" class="text-[10px] text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-500/20 hover:bg-rose-900/40">Delete 🗑️</button>` : ''}
+                    <button onclick="deleteMessage('${msgId}')" class="text-[10px] text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-500/20 hover:bg-rose-900/40">Delete 🗑️</button>
                 </div>
             `;
 
@@ -513,9 +704,9 @@
             messagesContainer.appendChild(row);
         }
 
-        // Delete Single Message/Image Functionality
+        // Delete Message/Image Functionality (Both Sender and Receiver entries)
         window.deleteMessage = function (msgId) {
-            if (confirm("Are you sure you want to delete this message/image permanently?")) {
+            if (confirm("Are you sure you want to delete this message permanently from this room?")) {
                 db.collection('rooms').doc(currentRoomId).collection('messages').doc(msgId).delete()
                     .catch(err => alert("Error deleting message: " + err.message));
             }
@@ -578,6 +769,7 @@
             inputAreaContainer.classList.add('hidden');
             chatColorPicker.classList.add('hidden');
             btnClearHistory.classList.add('hidden');
+            callButtonsContainer.classList.add('hidden');
         }
 
         function escapeHTML(str) {
