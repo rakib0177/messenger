@@ -117,32 +117,36 @@ function launchUserProfileView(userData) {
 }
 document.getElementById('profile-btn-close').addEventListener('click', () => profileViewModal.classList.add('hidden'));
 
-// --- DISCOVERY LOOKUP SYSTEM ---
+// 🔥 FIXED: SEARCH LOOKUP PIPELINE (এখন টাইপ করলেই ইনস্ট্যান্ট ডাটাবেস চেক করবে)
 searchInput.addEventListener('input', async (e) => {
     const queryVal = e.target.value.trim().toLowerCase();
-    if (!queryVal) { searchResults.classList.add('hidden'); return; }
+    if (!queryVal) { searchResults.classList.add('hidden'); searchResults.innerHTML = ''; return; }
 
-    const q = query(collection(db, "users"), where("email", "==", queryVal));
-    const snap = await getDocs(q);
-    searchResults.innerHTML = '';
+    try {
+        const q = query(collection(db, "users"), where("email", "==", queryVal));
+        const snap = await getDocs(q);
+        searchResults.innerHTML = '';
 
-    if (snap.empty) {
-        searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">No user profiles mapping database</p>`;
-    } else {
-        snap.forEach(d => {
-            const data = d.data();
-            if (data.uid === currentUser.uid) return;
-            const el = document.createElement('div');
-            el.className = "p-3 flex items-center justify-between border-b hover:bg-gray-50";
-            el.innerHTML = `
-                <div class="flex items-center gap-2 cursor-pointer search-view-profile"><img src="${data.photoURL}" class="w-6 h-6 rounded-full"><span class="text-xs font-bold">${data.displayName}</span></div>
-                <button class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg trigger-send-req" data-id="${data.uid}">Connect</button>
-            `;
-            el.querySelector('.search-view-profile').onclick = () => launchUserProfileView(data);
-            searchResults.appendChild(el);
-        });
+        if (snap.empty) {
+            searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">No matching user profile found</p>`;
+        } else {
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.uid === currentUser.uid) return;
+                const el = document.createElement('div');
+                el.className = "p-3 flex items-center justify-between border-b hover:bg-gray-50 bg-white";
+                el.innerHTML = `
+                    <div class="flex items-center gap-2 cursor-pointer search-view-profile"><img src="${data.photoURL}" class="w-6 h-6 rounded-full"><span class="text-xs font-bold">${data.displayName}</span></div>
+                    <button class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg trigger-send-req" data-id="${data.uid}">Connect</button>
+                `;
+                el.querySelector('.search-view-profile').onclick = () => launchUserProfileView(data);
+                searchResults.appendChild(el);
+            });
+        }
+        searchResults.classList.remove('hidden');
+    } catch (err) {
+        console.error("Search Error: ", err);
     }
-    searchResults.classList.remove('hidden');
 });
 
 document.body.addEventListener('click', async (e) => {
@@ -294,7 +298,7 @@ document.getElementById('btn-send-msg').addEventListener('click', () => {
     input.value = '';
 });
 
-// FIXED: CHAT IMAGE TRANSMISSION SYSTEM
+// CHAT IMAGE TRANSMISSION SYSTEM
 document.getElementById('chat-image-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file || !activeChatUser) return;
@@ -304,14 +308,14 @@ document.getElementById('chat-image-input').addEventListener('change', async (e)
         const snap = await uploadBytes(storageRef, file);
         const downloadUrl = await getDownloadURL(snap.ref);
         await dispatchChatMessage({ mediaUrl: downloadUrl, text: '[Image Photo]' }, 'image');
-        e.target.value = ''; // input reset
+        e.target.value = '';
     } catch (err) {
         console.error(err);
-        alert("Image upload failed. Ensure your Firebase Storage rules allow writing.");
+        alert("Image upload failed.");
     }
 });
 
-// FIXED: VOICE RECORD NOTES DISPATCH PIPELINE
+// VOICE RECORD NOTES DISPATCH PIPELINE
 const voiceBtn = document.getElementById('btn-voice-record');
 voiceBtn.addEventListener('click', async () => {
     if (!activeChatUser) return;
@@ -342,7 +346,7 @@ voiceBtn.addEventListener('click', async () => {
             mediaRecorder.start();
             voiceBtn.classList.replace('text-gray-400', 'text-red-500');
         } catch (mediaErr) {
-            alert("Microphone access denied or unavailable.");
+            alert("Microphone access denied.");
         }
     } else {
         mediaRecorder.stop();
@@ -351,21 +355,55 @@ voiceBtn.addEventListener('click', async () => {
     }
 });
 
-// --- BROADCAST SOCIAL FEED ENGINE ---
+// 🔥 FIXED: BROADCAST SOCIAL FEED PUBLISH & STREAM ENGINE (ফিড আপলোড ফিক্স)
+document.getElementById('btn-submit-post').addEventListener('click', async () => {
+    const textInput = document.getElementById('post-text');
+    const imageInput = document.getElementById('post-image-input');
+    const text = textInput.value.trim();
+    const file = imageInput.files[0];
+
+    if (!text && !file) { alert("Please write a message or select an image to post."); return; }
+
+    try {
+        let imageUrl = "";
+        if (file) {
+            const storageRef = ref(storage, `posts/${Date.now()}_${file.name}`);
+            const snap = await uploadBytes(storageRef, file);
+            imageUrl = await getDownloadURL(snap.ref);
+        }
+
+        await addDoc(collection(db, "posts"), {
+            authorId: currentUser.uid,
+            authorName: currentUser.displayName || "Anonymous User",
+            authorPic: currentUser.photoURL || "https://via.placeholder.com/150",
+            text: text,
+            image: imageUrl,
+            timestamp: Date.now()
+        });
+
+        textInput.value = "";
+        imageInput.value = "";
+        alert("Post uploaded successfully into Feed Stream!");
+    } catch (err) {
+        console.error("Feed upload fail: ", err);
+        alert("Failed to upload feed post.");
+    }
+});
+
 function loadGlobalFeed() {
     onSnapshot(query(collection(db, "posts"), orderBy("timestamp", "desc")), (snapshot) => {
         feedStream.innerHTML = '';
         snapshot.forEach(d => {
             const post = d.data();
             const postCard = document.createElement('div');
-            postCard.className = "bg-white p-4 rounded-2xl border border-gray-100 shadow-3xs";
+            postCard.className = "bg-white p-4 rounded-2xl border border-gray-100 shadow-3xs mb-4";
             postCard.innerHTML = `
                 <div class="flex items-center gap-2.5 mb-3">
                     <img src="${post.authorPic}" class="w-8 h-8 rounded-full border" alt="author">
                     <div><h4 class="font-bold text-xs text-gray-800">${post.authorName}</h4></div>
                 </div>
-                <p class="text-xs text-gray-700 mb-2">${post.text || ''}</p>
-                ${post.image ? `<img src="${post.image}" class="w-full rounded-xl object-cover" alt="post-img">` : ''}
+                ${post.text ? `<p class="text-xs text-gray-700 mb-2">${post.text}</p>` : ''}
+                ${post.image ? `<img src="${post.image}" class="w-full rounded-xl object-cover max-h-64 mt-2" alt="post-img">` : ''}
             `;
             feedStream.appendChild(postCard);
         });
