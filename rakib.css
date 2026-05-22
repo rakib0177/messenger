@@ -1,0 +1,59 @@
+/* Strict Viewport Lock to prevent bottom elements cutoff */
+html,
+body {
+    height: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.page-view {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.page-view.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item.active {
+    color: #1877f2;
+}
+
+/* Theme Engines */
+.theme-blue {
+    background-color: #eff6ff;
+}
+
+.theme-red {
+    background-color: #fef2f2;
+}
+
+.theme-emerald {
+    background-color: #ecfdf5;
+}
+
+.theme-dark {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+/* Notification Dropdown Keyframes */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.3s ease-out forwards;
+}
