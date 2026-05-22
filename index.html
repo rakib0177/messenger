@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger Ultra Pro Max - Live Calling & Voice Edition</title>
+    <title>Messenger Ultra Pro Max - Ultimate Security & Call Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -132,7 +132,7 @@
             <i class="fab fa-facebook-messenger"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Messenger Pro</h2>
-        <p class="text-gray-500 mb-6">Real-Time Voice, Calling & Posts Connected</p>
+        <p class="text-gray-500 mb-6">Secure Chats, Audio Control & Full-Screen WebRTC</p>
         <button id="btn-google-login"
             class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -289,35 +289,48 @@
         </div>
 
         <div id="calling-screen"
-            class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between p-6 hidden-pane text-white">
-            <div class="text-center mt-4 w-full">
-                <img id="call-screen-avatar" src="https://via.placeholder.com/100"
-                    class="w-20 h-20 rounded-full object-cover mx-auto ring-4 ring-pink-500 shadow-xl">
-                <h2 id="call-screen-name" class="text-lg font-bold mt-3">User Name</h2>
-                <p id="call-screen-type" class="text-gray-400 text-xs mt-1 animate-pulse">Establishing Live Stream...
-                </p>
+            class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between hidden-pane text-white">
 
-                <div id="video-streams-container" class="mt-6 grid grid-cols-2 gap-3 max-w-sm mx-auto hidden-pane">
-                    <div class="bg-gray-900 rounded-xl overflow-hidden border-2 border-pink-500 relative shadow-md">
-                        <video id="local-video" autoplay playsinline muted
-                            class="w-full h-40 object-cover bg-black"></video>
-                        <span
-                            class="absolute bottom-1 left-2 text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white font-medium">You</span>
-                    </div>
-                    <div class="bg-gray-900 rounded-xl overflow-hidden border-2 border-gray-700 relative shadow-md">
-                        <video id="remote-video" autoplay playsinline class="w-full h-40 object-cover bg-black"></video>
-                        <span id="remote-label"
-                            class="absolute bottom-1 left-2 text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white font-medium">Remote</span>
-                    </div>
+            <div class="absolute inset-0 w-full h-full z-0 bg-black">
+                <video id="remote-video" autoplay playsinline class="w-full h-full object-cover hidden-pane"></video>
+                <div id="audio-call-ui-fallback"
+                    class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-900 to-slate-950">
+                    <img id="call-screen-avatar" src="https://via.placeholder.com/100"
+                        class="w-24 h-24 rounded-full object-cover border-4 border-pink-500 shadow-2xl animate-pulse">
+                    <h2 id="call-screen-name" class="text-xl font-bold mt-4">User Name</h2>
+                    <p id="call-screen-type" class="text-gray-400 text-sm mt-1">Establishing Call...</p>
                 </div>
             </div>
-            <div class="flex gap-8 mb-6">
-                <button id="btn-accept-call"
-                    class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl hover:bg-green-600 shadow-2xl transition transform active:scale-90 hidden-pane"><i
-                        class="fas fa-phone"></i></button>
-                <button onclick="endLiveCall()"
-                    class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-2xl hover:bg-red-700 shadow-2xl transition transform active:scale-90"><i
-                        class="fas fa-phone-slash"></i></button>
+
+            <div id="local-video-wrapper"
+                class="absolute bottom-24 right-4 w-28 h-40 bg-gray-900 rounded-xl overflow-hidden border-2 border-white shadow-2xl z-10 hidden-pane">
+                <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+            </div>
+
+            <div class="z-20 w-full p-4 bg-gradient-to-b from-black/60 to-transparent text-center">
+                <span id="call-status-overlay"
+                    class="text-xs bg-pink-600/80 px-3 py-1 rounded-full uppercase tracking-wider font-bold">Live
+                    Signaling</span>
+            </div>
+
+            <div
+                class="z-20 w-full pb-8 pt-4 px-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center gap-4">
+                <div class="flex gap-5 justify-center items-center mb-2">
+                    <button id="btn-toggle-mic"
+                        class="w-12 h-12 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-lg transition"><i
+                            id="mic-icon" class="fas fa-microphone"></i></button>
+                    <button id="btn-toggle-cam"
+                        class="w-12 h-12 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center text-lg transition"><i
+                            id="cam-icon" class="fas fa-video"></i></button>
+                </div>
+                <div class="flex gap-8">
+                    <button id="btn-accept-call"
+                        class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl hover:bg-green-600 shadow-2xl transition transform active:scale-90 hidden-pane"><i
+                            class="fas fa-phone"></i></button>
+                    <button onclick="endLiveCall()"
+                        class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-2xl hover:bg-red-700 shadow-2xl transition transform active:scale-90"><i
+                            class="fas fa-phone-slash"></i></button>
+                </div>
             </div>
         </div>
 
@@ -370,8 +383,6 @@
             appId: "1:277785483742:web:eea123b02bf1d2f987e54f",
             measurementId: "G-BTR2FS9EY5"
         };
-
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
@@ -379,8 +390,9 @@
 
         let currentUser = null, activeChatUser = null, selectedMessageId = null, base64StoryImage = null;
         let callRefGlobal = null, localStream = null, peerConnection = null, mediaRecorder = null, voiceChunks = [];
+        let currentActiveAudio = null, currentActiveAudioButton = null;
+        let isMicEnabled = true, isCamEnabled = true;
 
-        // STUN / TURN সার্ভার কনফিগারেশন (WebRTC মিডিয়া স্ট্রিম বাউন্স করার জন্য ফ্রিতে গুগল প্রোভাইড করে)
         const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
         function playNotificationSound(type = 'sms') {
@@ -464,20 +476,28 @@
             });
         }
 
-        // 📞 REAL-TIME WebRTC AUDIO/VIDEO CALLING ENGINE WITH LIVE STREAM
+        // 📞 REAL-TIME WebRTC AUDIO/VIDEO CALLING ENGINE WITH FULL SCREEN VIEW & CONTROLS
         window.initiateLiveCall = async function (type) {
             if (!activeChatUser || activeChatUser.isGroup) return;
             try {
+                isMicEnabled = true; isCamEnabled = true;
+                updateMediaControlUI();
+
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'Video' });
                 document.getElementById('local-video').srcObject = localStream;
-                document.getElementById('video-streams-container').classList.remove('hidden-pane');
+
+                if (type === 'Video') {
+                    document.getElementById('local-video-wrapper').classList.remove('hidden-pane');
+                } else {
+                    document.getElementById('local-video-wrapper').classList.add('hidden-pane');
+                }
 
                 const callId = `${currentUser.uid}_to_${activeChatUser.uid}`;
                 callRefGlobal = ref(db, 'calls/' + callId);
 
                 document.getElementById('call-screen-name').innerText = activeChatUser.name;
                 document.getElementById('call-screen-avatar').src = activeChatUser.avatar;
-                document.getElementById('call-screen-type').innerText = `Ringing (${type})...`;
+                document.getElementById('call-status-overlay').innerText = `Ringing (${type})`;
                 document.getElementById('btn-accept-call').classList.add('hidden-pane');
                 document.getElementById('calling-screen').classList.remove('hidden-pane');
                 playNotificationSound('call');
@@ -486,7 +506,12 @@
                 localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
                 peerConnection.ontrack = (event) => {
-                    document.getElementById('remote-video').srcObject = event.streams[0];
+                    const remoteVideo = document.getElementById('remote-video');
+                    remoteVideo.srcObject = event.streams[0];
+                    if (type === 'Video') {
+                        remoteVideo.classList.remove('hidden-pane');
+                        document.getElementById('audio-call-ui-fallback').classList.add('opacity-0');
+                    }
                 };
 
                 peerConnection.onicecandidate = (event) => {
@@ -504,13 +529,12 @@
                     type: type, status: 'ringing', offer: { sdp: offer.sdp, type: offer.type }
                 });
 
-                // অ্যানসার এবং আইস ক্যান্ডিডেট লিসেনার ট্র্যাকিং
                 onValue(ref(db, `calls/${callId}/answer`), async (snap) => {
                     const answer = snap.val();
                     if (answer && peerConnection.signalingState !== "stable") {
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
                         stopNotificationSound();
-                        document.getElementById('call-screen-type').innerText = `🎙️ Call Connected (Live)`;
+                        document.getElementById('call-status-overlay').innerText = `Live Connected`;
                     }
                 });
 
@@ -530,10 +554,13 @@
                 if (!snapshot.val()) return;
                 Object.values(snapshot.val()).forEach(async (call) => {
                     if (call.receiverId === currentUser.uid && call.status === 'ringing') {
+                        isMicEnabled = true; isCamEnabled = true;
+                        updateMediaControlUI();
+
                         callRefGlobal = ref(db, 'calls/' + call.id);
                         document.getElementById('call-screen-name').innerText = call.callerName;
                         document.getElementById('call-screen-avatar').src = call.callerAvatar;
-                        document.getElementById('call-screen-type').innerText = `Incoming ${call.type} Call...`;
+                        document.getElementById('call-status-overlay').innerText = `Incoming ${call.type} Call`;
                         document.getElementById('btn-accept-call').classList.remove('hidden-pane');
                         document.getElementById('calling-screen').classList.remove('hidden-pane');
                         playNotificationSound('call');
@@ -543,13 +570,21 @@
                                 stopNotificationSound();
                                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: call.type === 'Video' });
                                 document.getElementById('local-video').srcObject = localStream;
-                                document.getElementById('video-streams-container').classList.remove('hidden-pane');
+
+                                if (call.type === 'Video') {
+                                    document.getElementById('local-video-wrapper').classList.remove('hidden-pane');
+                                }
 
                                 peerConnection = new RTCPeerConnection(rtcConfig);
                                 localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
                                 peerConnection.ontrack = (event) => {
-                                    document.getElementById('remote-video').srcObject = event.streams[0];
+                                    const remoteVideo = document.getElementById('remote-video');
+                                    remoteVideo.srcObject = event.streams[0];
+                                    if (call.type === 'Video') {
+                                        remoteVideo.classList.remove('hidden-pane');
+                                        document.getElementById('audio-call-ui-fallback').classList.add('opacity-0');
+                                    }
                                 };
 
                                 peerConnection.onicecandidate = (event) => {
@@ -570,7 +605,7 @@
                                     }
                                 });
 
-                                document.getElementById('call-screen-type').innerText = `🎙️ Call Connected (Live)`;
+                                document.getElementById('call-status-overlay').innerText = `Live Connected`;
                                 document.getElementById('btn-accept-call').classList.add('hidden-pane');
                             } catch (e) { alert("Media connection failed!"); console.error(e); }
                         };
@@ -579,16 +614,40 @@
             });
         }
 
+        // ক্যামেরা এবং স্পিকার মিউট টগল লজিক
+        document.getElementById('btn-toggle-mic').onclick = () => {
+            if (localStream) {
+                isMicEnabled = !isMicEnabled;
+                localStream.getAudioTracks().forEach(track => track.enabled = isMicEnabled);
+                updateMediaControlUI();
+            }
+        };
+
+        document.getElementById('btn-toggle-cam').onclick = () => {
+            if (localStream && localStream.getVideoTracks().length > 0) {
+                isCamEnabled = !isCamEnabled;
+                localStream.getVideoTracks().forEach(track => track.enabled = isCamEnabled);
+                updateMediaControlUI();
+            }
+        };
+
+        function updateMediaControlUI() {
+            document.getElementById('mic-icon').className = isMicEnabled ? "fas fa-microphone" : "fas fa-microphone-slash text-red-500";
+            document.getElementById('cam-icon').className = isCamEnabled ? "fas fa-video" : "fas fa-video-slash text-red-500";
+        }
+
         window.endLiveCall = function () {
             stopNotificationSound();
             if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
             if (peerConnection) { peerConnection.close(); peerConnection = null; }
             if (callRefGlobal) { remove(callRefGlobal); callRefGlobal = null; }
             document.getElementById('calling-screen').classList.add('hidden-pane');
-            document.getElementById('video-streams-container').classList.add('hidden-pane');
+            document.getElementById('remote-video').classList.add('hidden-pane');
+            document.getElementById('local-video-wrapper').classList.add('hidden-pane');
+            document.getElementById('audio-call-ui-fallback').classList.remove('opacity-0');
         };
 
-        // 🎙️ অডিও ভয়েস মেসেজ ইঞ্জিন (রেকর্ডিং এবং অন্য ইউজারের শোনার সলিউশন)
+        // 🎙️ অডিও ভয়েস মেসেজ ইঞ্জিন (Play/Pause কন্ট্রোল ফিচার সহ)
         const voiceBtn = document.getElementById('btn-voice-record');
         let recordSeconds = 0, recordingInterval = null;
 
@@ -599,7 +658,6 @@
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                     voiceChunks = [];
-
                     mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) voiceChunks.push(e.data); };
 
                     mediaRecorder.onstop = () => {
@@ -625,23 +683,69 @@
             }
         };
 
-        window.playVoiceNote = function (base64Data) {
+        window.toggleVoiceNote = function (btn, base64Data) {
             if (!base64Data) return;
-            const audio = new Audio(base64Data);
-            audio.play().catch(e => alert("Audio playback issue on this browser!"));
+
+            if (currentActiveAudio && currentActiveAudioButton === btn) {
+                if (!currentActiveAudio.paused) {
+                    currentActiveAudio.pause();
+                    btn.innerHTML = `<i class="fas fa-play"></i> Listen Voice Note`;
+                } else {
+                    currentActiveAudio.play();
+                    btn.innerHTML = `<i class="fas fa-pause"></i> Pause Voice Note`;
+                }
+            } else {
+                if (currentActiveAudio) {
+                    currentActiveAudio.pause();
+                    if (currentActiveAudioButton) currentActiveAudioButton.innerHTML = `<i class="fas fa-play"></i> Listen Voice Note`;
+                }
+
+                currentActiveAudio = new Audio(base64Data);
+                currentActiveAudioButton = btn;
+
+                currentActiveAudio.play().catch(e => alert("Audio playback issue on this browser!"));
+                btn.innerHTML = `<i class="fas fa-pause"></i> Pause Voice Note`;
+
+                currentActiveAudio.onended = () => {
+                    btn.innerHTML = `<i class="fas fa-play"></i> Listen Voice Note`;
+                    currentActiveAudio = null;
+                    currentActiveAudioButton = null;
+                };
+            }
         };
 
-        // 💬 চ্যাট অপারেশনস ও মেসেজ উইন্ডো
+        // 💬 চ্যাট অপারেশনস ও ফ্রেন্ড রিকোয়েস্ট সিকিউরিটি লক চেক
         window.startChatWith = function (uid, name, avatar, isGroup = false, email = '') {
+            if (isGroup) {
+                proceedToChat(uid, name, avatar, isGroup, email);
+                return;
+            }
+
+            // ফ্রেন্ডশিপ ভেরিফিকেশন চেক (মিউচুয়াল ফ্রেন্ড না হলে মেসেজিং লক থাকবে)
+            onValue(ref(db, `friends/${currentUser.uid}/${uid}`), (snap) => {
+                if (snap.exists() || uid === currentUser.uid) {
+                    proceedToChat(uid, name, avatar, isGroup, email);
+                } else {
+                    alert(`❌ Chat Locked! You cannot send messages until you both accept each other's friend request under the 'People' or 'Discover' tab.`);
+                }
+            }, { onlyOnce: true });
+        };
+
+        function proceedToChat(uid, name, avatar, isGroup, email) {
             activeChatUser = { uid, name, avatar, isGroup, email };
             document.getElementById(`inbox-card-${uid}`)?.classList.remove('unread-highlight');
             document.getElementById('chat-username').innerText = name;
             document.getElementById('chat-avatar').src = avatar;
             document.getElementById('chat-box-pane').classList.remove('hidden-pane');
             listenToMessages();
+        }
+
+        document.getElementById('back-to-list').onclick = () => {
+            if (currentActiveAudio) { currentActiveAudio.pause(); currentActiveAudio = null; }
+            document.getElementById('chat-box-pane').classList.add('hidden-pane');
+            activeChatUser = null;
         };
 
-        document.getElementById('back-to-list').onclick = () => { document.getElementById('chat-box-pane').classList.add('hidden-pane'); activeChatUser = null; };
         document.getElementById('btn-send-msg').onclick = sendMessage;
         document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
 
@@ -666,7 +770,7 @@
 
                         let innerContent = '';
                         if (msg.type === 'image') innerContent = `<img src="${msg.content}" class="max-w-[180px] rounded-xl border cursor-pointer" onclick="viewFullImage('${msg.content}')">`;
-                        else if (msg.type === 'voice') innerContent = `<button onclick="playVoiceNote('${msg.content}')" class="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-xs font-bold shadow-sm transition active:scale-95"><i class="fas fa-play"></i> Listen Voice Note</button>`;
+                        else if (msg.type === 'voice') innerContent = `<button onclick="toggleVoiceNote(this, '${msg.content}')" class="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-xs font-bold shadow-sm transition active:scale-95"><i class="fas fa-play"></i> Listen Voice Note</button>`;
                         else innerContent = `<p class="px-4 py-2 text-sm shadow-sm ${isMe ? 'my-bubble' : 'friend-bubble'}">${msg.content}</p>`;
 
                         const msgDiv = document.createElement('div'); msgDiv.innerHTML = innerContent;
@@ -820,7 +924,7 @@
                 Object.values(snapshot.val()).forEach(p => {
                     if (p.uid !== currentUser.uid) {
                         const item = document.createElement('div'); item.id = `inbox-card-${p.uid}`; item.className = "flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer";
-                        item.innerHTML = `<img src="${p.avatar}" class="w-10 h-10 rounded-full border"><div class="flex-1"><h4 class="font-semibold text-sm">${p.name}</h4><p class="text-xs text-gray-400 truncate">Tap to chat / view profile</p></div>`;
+                        item.innerHTML = `<img src="${p.avatar}" class="w-10 h-10 rounded-full border"><div class="flex-1"><h4 class="font-semibold text-sm">${p.name}</h4><p class="text-xs text-gray-400 truncate">Tap to check verification / chat</p></div>`;
                         item.onclick = () => startChatWith(p.uid, p.name, p.avatar, false, p.email); inboxList.appendChild(item);
                         activeStories.innerHTML += `<div class="flex flex-col items-center flex-shrink-0 cursor-pointer" onclick="startChatWith('${p.uid}', '${p.name}', '${p.avatar}', false, '${p.email}')"><img src="${p.avatar}" class="w-10 h-10 rounded-full ring-2 ring-pink-500 p-0.5"><span class="text-[10px] mt-1 text-gray-500 w-12 truncate text-center">${p.name.split(' ')[0]}</span></div>`;
                     }
@@ -836,5 +940,7 @@
         }
     </script>
 </body>
+
+</html>
 
 </html>
