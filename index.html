@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Connect Engine - Complete Messenger</title>
+    <title>Connect Engine - Ultimate Messenger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -41,10 +41,30 @@
             background-color: #1f2937;
             color: #f9fafb;
         }
+
+        /* Notification Slide Animation */
+        @keyframes slideDown {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-down {
+            animation: slideDown 0.3s ease-out forwards;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50 font-sans h-screen flex flex-col overflow-hidden select-none text-gray-800">
+
+    <div id="notification-toast-container"
+        class="fixed top-4 left-4 right-4 z-50 pointer-events-none flex flex-col gap-2"></div>
 
     <div id="auth-screen" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center p-6">
         <div class="text-center max-w-sm w-full">
@@ -132,8 +152,7 @@
 
             <div id="user-profile-view-modal"
                 class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center">
-                <div
-                    class="bg-white w-full max-w-md rounded-t-3xl p-6 space-y-6 animate-slide-up shadow-2xl text-center">
+                <div class="bg-white w-full max-w-md rounded-t-3xl p-6 space-y-6 text-center shadow-2xl">
                     <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
                         <img id="view-profile-pic" src="" class="w-full h-full object-cover">
                     </div>
@@ -143,7 +162,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-2">
                         <button id="profile-btn-chat"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2"><i
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow-md transition"><i
                                 class="fas fa-comment-alt"></i> Start Chat</button>
                         <button id="profile-btn-close"
                             class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs py-3 rounded-xl transition">Close
@@ -296,14 +315,14 @@
                 class="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-lg"><i
                     class="fas fa-phone-slash"></i></button>
             <button id="btn-accept-call"
-                class="bg-green-500 class animate-pulse w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-lg"><i
+                class="bg-green-500 animate-pulse w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-lg"><i
                     class="fas fa-phone"></i></button>
         </div>
     </div>
 
     <div id="call-overlay" class="hidden fixed inset-0 bg-gray-950 z-40 flex flex-col justify-between p-6 text-white">
         <div class="text-center pt-4">
-            <h2 id="call-status" class="text-base font-bold tracking-wide text-blue-400">Ringing Line Connect...</h2>
+            <h2 id="call-status" class="text-base font-bold tracking-wide text-blue-400">Connecting Audio/Video...</h2>
         </div>
         <div class="flex-1 flex justify-center items-center relative my-4">
             <video id="remote-video" autoplay playsinline
@@ -324,7 +343,7 @@
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, onSnapshot, orderBy, updateDoc, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // !!! আপনার FIREBASE ক্রিডেনশিয়ালস এখানে পেস্ট করুন !!!
+        // !!! আপনার FIREBASE CONFIGURATION এখানে ইনপুট করুন !!!
         const firebaseConfig = {
             apiKey: "AIzaSyCvW1eM0TD2afTBDWWqmSHksQbm3Esjl2I",
             authDomain: "tradingviews-77.firebaseapp.com",
@@ -335,7 +354,6 @@
             measurementId: "G-BTR2FS9EY5"
         };
 
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -345,8 +363,12 @@
         let currentUser = null, activeChatUser = null, isGroupContext = false;
         let mediaRecorder = null, audioChunks = [], localStream = null, currentCallId = null;
         let chatMessagesUnsubscribe = null, activeTargetActionData = null;
+        let peerConnection = null;
 
-        // UI Target Components
+        // WebRTC Signaling STUN Configuration Engine
+        const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
+        // DOM Components
         const authScreen = document.getElementById('auth-screen');
         const appScreen = document.getElementById('app-screen');
         const searchInput = document.getElementById('search-user');
@@ -355,12 +377,23 @@
         const requestsContainer = document.getElementById('requests-list-container');
         const feedStream = document.getElementById('feed-stream');
         const fullChatView = document.getElementById('fullscreen-chat-view');
-
-        // Modals
+        const profileViewModal = document.getElementById('user-profile-view-modal');
+        const actionSheet = document.getElementById('action-sheet');
         const profileModal = document.getElementById('profile-modal');
         const groupModal = document.getElementById('group-modal');
-        const actionSheet = document.getElementById('action-sheet');
-        const profileViewModal = document.getElementById('user-profile-view-modal');
+
+        // --- IN-APP REAL-TIME TOAST NOTIFICATION DRIVER ---
+        function sendInAppNotification(title, message) {
+            const container = document.getElementById('notification-toast-container');
+            const toast = document.createElement('div');
+            toast.className = "pointer-events-auto bg-gray-900/95 text-white p-3.5 rounded-xl shadow-xl flex flex-col gap-0.5 animate-slide-down border border-gray-700 max-w-sm ml-auto";
+            toast.innerHTML = `
+                <div class="flex items-center gap-2"><i class="fas fa-bell text-blue-400 text-xs"></i><span class="font-bold text-xs">${title}</span></div>
+                <p class="text-[11px] text-gray-300 pl-4 truncate">${message}</p>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3500);
+        }
 
         // --- AUTH PIPELINE SETUP ---
         document.getElementById('btn-login').addEventListener('click', async () => {
@@ -378,7 +411,7 @@
                         requestsReceived: []
                     });
                 }
-            } catch (err) { alert("Login Error: Provide valid Auth configuration."); }
+            } catch (err) { alert("Login Target Error! Check configuration keys."); }
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
@@ -392,6 +425,7 @@
                 syncLiveAppEngine();
                 loadGlobalFeed();
                 listenForIncomingCalls();
+                listenForGlobalIncomingMessages();
             } else {
                 currentUser = null;
                 authScreen.classList.remove('hidden');
@@ -404,7 +438,7 @@
             document.getElementById('user-display-name').textContent = name;
         }
 
-        // --- APP VIEW ROUTER PANELS ---
+        // --- NAVIGATION LAYOUT ROUTER ---
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -418,13 +452,12 @@
             });
         });
 
-        // --- INTERACTIVE PROFILE BOX (ACTIONS AT BOTTOM) ---
+        // --- USER PROFILE COMPONENT VIEW (ACTIONS SECURE AT BOTTOM) ---
         function launchUserProfileView(userData) {
             document.getElementById('view-profile-pic').src = userData.photoURL;
             document.getElementById('view-profile-name').textContent = userData.displayName;
             document.getElementById('view-profile-email').textContent = userData.email;
 
-            // Re-bind action handlers explicitly
             document.getElementById('profile-btn-chat').onclick = () => {
                 profileViewModal.classList.add('hidden');
                 openMessengerInterface(userData, false);
@@ -433,35 +466,18 @@
         }
         document.getElementById('profile-btn-close').addEventListener('click', () => profileViewModal.classList.add('hidden'));
 
-        // Trigger dynamic profile view inside active messaging room
         document.getElementById('chat-user-pic').onclick = () => { if (!isGroupContext) launchUserProfileView(activeChatUser); };
         document.getElementById('chat-user-name').onclick = () => { if (!isGroupContext) launchUserProfileView(activeChatUser); };
 
-        // --- UPDATE SYSTEM IDENTITY SETTINGS ---
-        document.getElementById('trigger-profile-modal').addEventListener('click', () => {
-            document.getElementById('edit-profile-name').value = currentUser.displayName;
-            profileModal.classList.remove('hidden');
-        });
-        document.getElementById('btn-close-profile').addEventListener('click', () => profileModal.classList.add('hidden'));
-
-        document.getElementById('btn-save-profile').addEventListener('click', async () => {
-            const newName = document.getElementById('edit-profile-name').value.trim();
-            const picFile = document.getElementById('edit-profile-pic').files[0];
-            let finalUrl = currentUser.photoURL;
-
-            if (!newName) return;
-            if (picFile) {
-                const picRef = ref(storage, `profiles/${currentUser.uid}_${Date.now()}`);
-                const snapshot = await uploadBytes(picRef, picFile);
-                finalUrl = await getDownloadURL(snapshot.ref);
-            }
-
-            await updateDoc(doc(db, "users", currentUser.uid), { displayName: newName, photoURL: finalUrl });
-            updateTopProfileUI(newName, finalUrl);
-            profileModal.classList.add('hidden');
+        // --- CHAT INTERFACE DYNAMIC THEME SELECTORS ---
+        document.querySelectorAll('#theme-selectors button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const selectedTheme = e.currentTarget.getAttribute('data-theme');
+                document.getElementById('chat-messages').className = `flex-1 overflow-y-auto p-4 space-y-3 theme-${selectedTheme}`;
+            });
         });
 
-        // --- GLOBAL SEARCH ARCHITECTURE ---
+        // --- DISCOVERY USER SEARCH QUERY ENGINE ---
         searchInput.addEventListener('input', async (e) => {
             const queryVal = e.target.value.trim().toLowerCase();
             if (!queryVal) { searchResults.classList.add('hidden'); return; }
@@ -471,7 +487,7 @@
             searchResults.innerHTML = '';
 
             if (snap.empty) {
-                searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">User not found</p>`;
+                searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">User profile empty</p>`;
             } else {
                 snap.forEach(d => {
                     const data = d.data();
@@ -499,7 +515,7 @@
             }
         });
 
-        // --- MESSENGER SYNCHRONIZATION PIPELINES ---
+        // --- SYNC SYSTEM CHANNELS ENGINE ---
         function syncLiveAppEngine() {
             onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
                 const uData = snap.data();
@@ -537,7 +553,7 @@
                     <img src="${data.photoURL}" class="w-10 h-10 rounded-full object-cover border">
                     <div>
                         <h4 class="font-bold text-xs text-gray-800">${data.displayName}</h4>
-                        <p class="text-[10px] text-gray-400">${isGroup ? 'Group Chat Room' : 'Tap to open chat'}</p>
+                        <p class="text-[10px] text-gray-400">${isGroup ? 'Group Chat Room' : 'Active Channel DM'}</p>
                     </div>
                 </div>
             `;
@@ -568,39 +584,28 @@
             }
         });
 
-        // --- GROUP ENGINE ACTION IMPLEMENTATION ---
-        document.getElementById('btn-open-group-modal').addEventListener('click', async () => {
-            const checklist = document.getElementById('group-friends-checklist');
-            checklist.innerHTML = '';
-            const myDoc = await getDoc(doc(db, "users", currentUser.uid));
-            const friends = myDoc.data().friends || [];
+        // --- GLOBAL REAL-TIME SMS MESSAGE NOTIFICATION SYSTEM ---
+        function listenForGlobalIncomingMessages() {
+            onSnapshot(collection(db, "chats"), (snapshot) => {
+                snapshot.docChanges().forEach(async (change) => {
+                    if (change.type === "modified" || change.type === "added") {
+                        const tokens = change.doc.id.split("_");
+                        if (tokens.includes(currentUser.uid)) {
+                            const msgQuery = query(collection(db, "chats", change.doc.id, "messages"), orderBy("timestamp", "desc"));
+                            const querySnap = await getDocs(msgQuery);
+                            if (!querySnap.empty) {
+                                const latestMsg = querySnap.docs[0].data();
+                                if (latestMsg.senderId !== currentUser.uid && (!activeChatUser || fullChatView.classList.contains('hidden'))) {
+                                    sendInAppNotification("New Chat Message", latestMsg.text || "Sent an attachment");
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
 
-            for (let fId of friends) {
-                const fDoc = await getDoc(doc(db, "users", fId));
-                if (fDoc.exists()) {
-                    checklist.innerHTML += `
-                        <label class="flex items-center gap-2 text-xs">
-                            <input type="checkbox" value="${fId}" class="group-member-checkbox"> ${fDoc.data().displayName}
-                        </label>
-                    `;
-                }
-            }
-            groupModal.classList.remove('hidden');
-        });
-
-        document.getElementById('btn-close-group').addEventListener('click', () => groupModal.classList.add('hidden'));
-        document.getElementById('btn-create-group').addEventListener('click', async () => {
-            const title = document.getElementById('group-name-input').value.trim();
-            const checkedBoxes = document.querySelectorAll('.group-member-checkbox:checked');
-            let memberIds = [currentUser.uid];
-            checkedBoxes.forEach(b => memberIds.push(b.value));
-
-            if (!title || memberIds.length < 2) return;
-            await addDoc(collection(db, "groups"), { name: title, members: memberIds, timestamp: Date.now() });
-            groupModal.classList.add('hidden');
-        });
-
-        // --- LIVE REAL-TIME CHAT MESSENGER ENGINE ---
+        // --- CORE CHAT MESSENGER LOGIC ---
         function openMessengerInterface(target, groupContextFlag) {
             activeChatUser = target;
             isGroupContext = groupContextFlag;
@@ -639,7 +644,10 @@
             });
         }
 
-        document.getElementById('close-chat').addEventListener('click', () => fullChatView.classList.add('hidden'));
+        document.getElementById('close-chat').addEventListener('click', () => {
+            fullChatView.classList.add('hidden');
+            activeChatUser = null;
+        });
 
         async function dispatchChatMessage(payload, type = 'text') {
             const roomPath = isGroupContext ? activeChatUser.uid : [currentUser.uid, activeChatUser.uid].sort().join("_");
@@ -654,7 +662,7 @@
             input.value = '';
         });
 
-        // CHAT IMAGE TRANSMISSION - VERIFIED STORAGE DRIVER
+        // CHAT IMAGE TRANSMISSION SYSTEM FIXED
         document.getElementById('chat-image-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -663,17 +671,17 @@
                 const snap = await uploadBytes(storageRef, file);
                 const downloadUrl = await getDownloadURL(snap.ref);
                 await dispatchChatMessage({ mediaUrl: downloadUrl, text: '[Image Photo]' }, 'image');
-            } catch (err) { alert("Storage Error: Ensure Firebase Storage rules allow public reads/writes."); }
+            } catch (err) { alert("File upload error. Check configuration."); }
         });
 
-        // RECORD VOICE NOTE DISPATCH ENGINE
+        // RECORD VOICE NOTE DISPATCH INFRASTRUCTURE FIXED
         const voiceBtn = document.getElementById('btn-voice-record');
         voiceBtn.addEventListener('click', async () => {
             if (!mediaRecorder) {
                 audioChunks = [];
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                 mediaRecorder.onstop = async () => {
                     const blob = new Blob(audioChunks, { type: 'audio/mp3' });
                     const fileRef = ref(storage, `audio/${Date.now()}.mp3`);
@@ -690,7 +698,7 @@
             }
         });
 
-        // --- MESSAGE CONTEXT UTILITIES ---
+        // --- CONTEXT UTILITY CONFIG (DELETE/FORWARD) ---
         function launchActionSheet(data) { activeTargetActionData = data; actionSheet.classList.remove('hidden'); }
         document.getElementById('action-cancel').addEventListener('click', () => actionSheet.classList.add('hidden'));
         document.getElementById('action-delete').addEventListener('click', async () => {
@@ -698,54 +706,27 @@
             await deleteDoc(doc(db, targetColPath, activeTargetActionData.id));
             actionSheet.classList.add('hidden');
         });
-        document.getElementById('action-forward').addEventListener('click', async () => {
-            actionSheet.classList.add('hidden');
-            const email = prompt("Enter target receiver's email:").toLowerCase().trim();
-            const snap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
-            if (snap.empty) return;
-            let fUid; snap.forEach(d => fUid = d.id);
-            const forwardedRoomCode = [currentUser.uid, fUid].sort().join("_");
-            await addDoc(collection(db, "chats", forwardedRoomCode, "messages"), {
-                senderId: currentUser.uid, timestamp: Date.now(), type: activeTargetActionData.type,
-                text: `[Forwarded]: ${activeTargetActionData.currentText}`, mediaUrl: activeTargetActionData.url
-            });
-        });
 
-        document.querySelectorAll('#theme-selectors button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const selectedTheme = e.currentTarget.getAttribute('data-theme');
-                document.getElementById('chat-messages').className = `flex-1 overflow-y-auto p-4 space-y-3 theme-${selectedTheme}`;
-            });
-        });
-
-        // --- VERIFIED TIMELINE BROADCAST SOCIAL FEED ENGINE ---
-        document.getElementById('post-image-input').addEventListener('change', () => {
-            document.getElementById('post-img-status').classList.remove('hidden');
-        });
-
+        // --- BROADCAST TIMELINE SOCIAL FEED ENGINE ---
         document.getElementById('btn-submit-post').addEventListener('click', async () => {
             const body = document.getElementById('post-text').value;
             const attachedFile = document.getElementById('post-image-input').files[0];
             let postDownloadUrl = null;
-
             if (!body.trim() && !attachedFile) return;
 
             try {
                 if (attachedFile) {
                     const postStorageRef = ref(storage, `posts/${Date.now()}_${attachedFile.name}`);
-                    const snapshotTask = await uploadBytes(postStorageRef, attachedFile);
-                    postDownloadUrl = await getDownloadURL(snapshotTask.ref);
+                    const snapTask = await uploadBytes(postStorageRef, attachedFile);
+                    postDownloadUrl = await getDownloadURL(snapTask.ref);
                 }
-
                 await addDoc(collection(db, "posts"), {
                     uid: currentUser.uid, authorName: currentUser.displayName, authorPic: currentUser.photoURL,
                     text: body, image: postDownloadUrl, timestamp: Date.now()
                 });
-
                 document.getElementById('post-text').value = '';
                 document.getElementById('post-image-input').value = '';
-                document.getElementById('post-img-status').classList.add('hidden');
-            } catch (e) { alert("Post Upload Refused"); }
+            } catch (e) { alert("Feed deployment target error."); }
         });
 
         function loadGlobalFeed() {
@@ -762,7 +743,6 @@
                                 <div><h4 class="font-bold text-xs text-gray-800">${post.authorName}</h4>
                                 <span class="text-[9px] text-gray-400">${new Date(post.timestamp).toLocaleTimeString()}</span></div>
                             </div>
-                            ${post.uid === currentUser.uid ? `<button class="text-gray-400 hover:text-red-500 trigger-delete-post" data-id="${d.id}"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
                         </div>
                         <p class="text-xs text-gray-700 leading-relaxed mb-2">${post.text || ''}</p>
                         ${post.image ? `<img src="${post.image}" class="w-full rounded-xl max-h-64 object-cover border shadow-xs">` : ''}
@@ -771,13 +751,9 @@
                 });
             });
         }
-        document.body.addEventListener('click', async (e) => {
-            const btn = e.target.closest('.trigger-delete-post');
-            if (btn) { if (confirm("Delete post permanent?")) await deleteDoc(doc(db, "posts", btn.getAttribute('data-id'))); }
-        });
 
-        // --- FULLY INTEGRATED REAL-TIME WEBRTC SIGNALLING FOR CALLS ---
-        async function triggerLiveCallChannel(videoEnabled = true) {
+        // --- FULL HARDWARE REAL-TIME WEBRTC SIGNALING AND CALLING ENGINE ---
+        async function initiateLiveWebRTCSession(videoEnabled = true) {
             if (isGroupContext) return;
             document.getElementById('call-overlay').classList.remove('hidden');
             document.getElementById('call-status').innerText = "Ringing user channel...";
@@ -785,7 +761,14 @@
             localStream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true });
             document.getElementById('local-video').srcObject = localStream;
 
-            // Write Database Signalling to target user's active node
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            peerConnection.ontrack = (event) => {
+                document.getElementById('remote-video').srcObject = event.streams[0];
+            };
+
+            // Firestore Signalling Channel Initialization
             const callDocRef = await addDoc(collection(db, "calls"), {
                 callerId: currentUser.uid, callerName: currentUser.displayName,
                 receiverId: activeChatUser.uid, status: "ringing", type: videoEnabled ? "video" : "audio",
@@ -793,9 +776,34 @@
             });
             currentCallId = callDocRef.id;
 
-            // Sync with Caller UI Session termination
-            onSnapshot(doc(db, "calls", currentCallId), (snap) => {
-                if (snap.exists() && snap.data().status === "rejected") terminateHardwareSession();
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    addDoc(collection(db, "calls", currentCallId, "callerCandidates"), event.candidate.toJSON());
+                }
+            };
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            await updateDoc(doc(db, "calls", currentCallId), { offer: { type: offer.type, sdp: offer.sdp } });
+
+            // Listen for Session Answers
+            onSnapshot(doc(db, "calls", currentCallId), async (snap) => {
+                const data = snap.data();
+                if (data && data.answer && !peerConnection.currentRemoteDescription) {
+                    const rtcAnswer = new RTCSessionDescription(data.answer);
+                    await peerConnection.setRemoteDescription(rtcAnswer);
+                    document.getElementById('call-status').innerText = "Call Connected Live";
+                }
+                if (data && data.status === "rejected") terminateHardwareSession();
+            });
+
+            // Listen for Remote ICE Candidates
+            onSnapshot(collection(db, "calls", currentCallId, "receiverCandidates"), (snapshot) => {
+                snapshot.docChanges().forEach(async (change) => {
+                    if (change.type === "added") {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                    }
+                });
             });
         }
 
@@ -807,6 +815,7 @@
                     currentCallId = d.id;
                     document.getElementById('incoming-caller-name').innerText = `${callData.callerName} is requesting a ${callData.type} call.`;
                     document.getElementById('incoming-call-overlay').classList.remove('hidden');
+                    sendInAppNotification("Incoming Session Call", `From ${callData.callerName}`);
                 });
             });
         }
@@ -814,13 +823,45 @@
         document.getElementById('btn-accept-call').addEventListener('click', async () => {
             document.getElementById('incoming-call-overlay').classList.add('hidden');
             document.getElementById('call-overlay').classList.remove('hidden');
-            document.getElementById('call-status').innerText = "Call session established.";
-            await updateDoc(doc(db, "calls", currentCallId), { status: "accepted" });
+            document.getElementById('call-status').innerText = "Establishing data streams...";
 
             const callSnap = await getDoc(doc(db, "calls", currentCallId));
-            const isVideo = callSnap.data().type === "video";
+            const callData = callSnap.data();
+            const isVideo = callData.type === "video";
+
             localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
             document.getElementById('local-video').srcObject = localStream;
+
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            peerConnection.ontrack = (event) => {
+                document.getElementById('remote-video').srcObject = event.streams[0];
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    addDoc(collection(db, "calls", currentCallId, "receiverCandidates"), event.candidate.toJSON());
+                }
+            };
+
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            await updateDoc(doc(db, "calls", currentCallId), { answer: { type: answer.type, sdp: answer.sdp }, status: "accepted" });
+
+            onSnapshot(collection(db, "calls", currentCallId, "callerCandidates"), (snapshot) => {
+                snapshot.docChanges().forEach(async (change) => {
+                    if (change.type === "added") {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                    }
+                });
+            });
+
+            onSnapshot(doc(db, "calls", currentCallId), (snap) => {
+                if (snap.exists() && snap.data().status === "rejected") terminateHardwareSession();
+            });
         });
 
         document.getElementById('btn-decline-call').addEventListener('click', async () => {
@@ -834,14 +875,14 @@
         });
 
         function terminateHardwareSession() {
-            if (localStream) localStream.getTracks().forEach(t => t.stop());
+            if (peerConnection) { peerConnection.close(); peerConnection = null; }
+            if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
             document.getElementById('call-overlay').classList.add('hidden');
             document.getElementById('incoming-call-overlay').classList.add('hidden');
-            localStream = null;
         }
 
-        document.getElementById('btn-voice-call').addEventListener('click', () => triggerLiveCallChannel(false));
-        document.getElementById('btn-video-call').addEventListener('click', () => triggerLiveCallChannel(true));
+        document.getElementById('btn-voice-call').addEventListener('click', () => initiateLiveWebRTCSession(false));
+        document.getElementById('btn-video-call').addEventListener('click', () => initiateLiveWebRTCSession(true));
     </script>
 </body>
 
