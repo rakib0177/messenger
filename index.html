@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger Ultra Pro Max - Ultimate Security & Call Edition</title>
+    <title>Messenger Ultra Pro Max - Ultimate Mobile Redirect Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -132,7 +132,7 @@
             <i class="fab fa-facebook-messenger"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Messenger Pro</h2>
-        <p class="text-gray-500 mb-6">Secure Chats, Audio Control & Full-Screen WebRTC</p>
+        <p class="text-gray-500 mb-6">Secure Chats, Audio Control & Mobile Redirect Login</p>
         <button id="btn-google-login"
             class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@
                 <path fill="#EA4335"
                     d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.93 1.19 15.22 0 12 0 7.31 0 3.18 2.12 1.21 5.41l4.11 3.11c.94-2.85 3.57-4.96 6.68-4.96z" />
             </svg>
-            Sign in with Gmail
+            Sign in with Gmail (Mobile Friendly)
         </button>
     </div>
 
@@ -198,8 +198,13 @@
                         <button id="btn-select-story-img" class="theme-text text-sm font-medium"><i
                                 class="fas fa-image"></i> Add Photo</button>
                         <input type="file" id="story-image-input" accept="image/*" class="hidden">
-                        <button id="btn-post-story"
-                            class="theme-bg text-white px-5 py-1.5 rounded-full text-xs font-bold shadow">Post</button>
+                        <div class="flex gap-2">
+                            <button onclick="clearAllStoriesHistory()"
+                                class="bg-red-100 text-red-600 px-3 py-1.5 rounded-full text-xs font-bold hover:bg-red-200 transition">Clear
+                                All</button>
+                            <button id="btn-post-story"
+                                class="theme-bg text-white px-5 py-1.5 rounded-full text-xs font-bold shadow">Post</button>
+                        </div>
                     </div>
                     <div id="story-img-preview" class="mt-2 hidden-pane max-h-36 overflow-hidden rounded-lg border">
                     </div>
@@ -290,7 +295,6 @@
 
         <div id="calling-screen"
             class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between hidden-pane text-white">
-
             <div class="absolute inset-0 w-full h-full z-0 bg-black">
                 <video id="remote-video" autoplay playsinline class="w-full h-full object-cover hidden-pane"></video>
                 <div id="audio-call-ui-fallback"
@@ -370,7 +374,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        // 🔄 পপআপ রিমুভ করে signInWithRedirect এবং getRedirectResult ইম্পোর্ট করা হয়েছে
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // 🔥 আপনার অরিজিনাল Firebase Credentials এখানে বসিয়ে নিন
@@ -438,8 +443,14 @@
             if (tabName === 'stories') loadStoriesTimeline();
         };
 
-        document.getElementById('btn-google-login').addEventListener('click', () => signInWithPopup(auth, provider));
+        // 🔄 মোবাইলের জন্য পপআপ পরিবর্তন করে রিডাইরেক্ট মোড করা হলো
+        document.getElementById('btn-google-login').addEventListener('click', () => signInWithRedirect(auth, provider));
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => location.reload()));
+
+        // রিডাইরেক্ট হয়ে সফলভাবে ফিরে আসার ট্র্যাকিং হ্যান্ডেলার
+        getRedirectResult(auth).catch((error) => {
+            console.error("Login Redirect Error: ", error);
+        });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -476,7 +487,7 @@
             });
         }
 
-        // 📞 REAL-TIME WebRTC AUDIO/VIDEO CALLING ENGINE WITH FULL SCREEN VIEW & CONTROLS
+        // 📞 WebRTC CALL ENGINE
         window.initiateLiveCall = async function (type) {
             if (!activeChatUser || activeChatUser.isGroup) return;
             try {
@@ -546,7 +557,7 @@
 
                 onValue(callRefGlobal, (snap) => { if (!snap.val()) endLiveCall(); });
 
-            } catch (err) { alert("Microphone/Camera initialization failed!"); console.error(err); }
+            } catch (err) { alert("Microphone/Camera initialization failed!"); }
         };
 
         function listenForIncomingCalls() {
@@ -607,14 +618,13 @@
 
                                 document.getElementById('call-status-overlay').innerText = `Live Connected`;
                                 document.getElementById('btn-accept-call').classList.add('hidden-pane');
-                            } catch (e) { alert("Media connection failed!"); console.error(e); }
+                            } catch (e) { alert("Media connection failed!"); }
                         };
                     }
                 });
             });
         }
 
-        // ক্যামেরা এবং স্পিকার মিউট টগল লজিক
         document.getElementById('btn-toggle-mic').onclick = () => {
             if (localStream) {
                 isMicEnabled = !isMicEnabled;
@@ -647,7 +657,7 @@
             document.getElementById('audio-call-ui-fallback').classList.remove('opacity-0');
         };
 
-        // 🎙️ অডিও ভয়েস মেসেজ ইঞ্জিন (Play/Pause কন্ট্রোল ফিচার সহ)
+        // 🎙️ VOICE CHAT PLAYER / PAUSE CONTROL
         const voiceBtn = document.getElementById('btn-voice-record');
         let recordSeconds = 0, recordingInterval = null;
 
@@ -685,7 +695,6 @@
 
         window.toggleVoiceNote = function (btn, base64Data) {
             if (!base64Data) return;
-
             if (currentActiveAudio && currentActiveAudioButton === btn) {
                 if (!currentActiveAudio.paused) {
                     currentActiveAudio.pause();
@@ -699,29 +708,20 @@
                     currentActiveAudio.pause();
                     if (currentActiveAudioButton) currentActiveAudioButton.innerHTML = `<i class="fas fa-play"></i> Listen Voice Note`;
                 }
-
                 currentActiveAudio = new Audio(base64Data);
                 currentActiveAudioButton = btn;
-
-                currentActiveAudio.play().catch(e => alert("Audio playback issue on this browser!"));
+                currentActiveAudio.play().catch(e => console.log("Audio play error"));
                 btn.innerHTML = `<i class="fas fa-pause"></i> Pause Voice Note`;
-
                 currentActiveAudio.onended = () => {
                     btn.innerHTML = `<i class="fas fa-play"></i> Listen Voice Note`;
-                    currentActiveAudio = null;
-                    currentActiveAudioButton = null;
+                    currentActiveAudio = null; currentActiveAudioButton = null;
                 };
             }
         };
 
-        // 💬 চ্যাট অপারেশনস ও ফ্রেন্ড রিকোয়েস্ট সিকিউরিটি লক চেক
+        // 💬 CHAT LOCK SYSTEM & MESSAGES
         window.startChatWith = function (uid, name, avatar, isGroup = false, email = '') {
-            if (isGroup) {
-                proceedToChat(uid, name, avatar, isGroup, email);
-                return;
-            }
-
-            // ফ্রেন্ডশিপ ভেরিফিকেশন চেক (মিউচুয়াল ফ্রেন্ড না হলে মেসেজিং লক থাকবে)
+            if (isGroup) { proceedToChat(uid, name, avatar, isGroup, email); return; }
             onValue(ref(db, `friends/${currentUser.uid}/${uid}`), (snap) => {
                 if (snap.exists() || uid === currentUser.uid) {
                     proceedToChat(uid, name, avatar, isGroup, email);
@@ -811,7 +811,16 @@
             }
         };
 
-        // 👥 DISCOVER & FRIEND REQUESTS ENGINE
+        // 🧹 ডিলিট অল স্টোরি হিস্টোরি ফাংশন
+        window.clearAllStoriesHistory = function () {
+            if (confirm("Are you sure you want to delete ALL stories history from the database completely?")) {
+                remove(ref(db, 'stories')).then(() => {
+                    alert("All stories history cleared successfully!");
+                }).catch((err) => { alert("Error: " + err.message); });
+            }
+        };
+
+        // 👥 DISCOVER & PENDING REQUESTS
         function loadDiscoverUsers() {
             onValue(ref(db, 'users'), (snapshot) => {
                 const container = document.getElementById('discover-users-list'); container.innerHTML = ''; if (!snapshot.val()) return;
@@ -821,6 +830,7 @@
                     row.innerHTML = `<div class="flex items-center gap-2 cursor-pointer" onclick="showProfileDetails('${u.name}','${u.avatar}','${u.email}')"><img src="${u.avatar}" class="w-9 h-9 rounded-full"><span class="text-sm font-medium">${u.name}</span></div>
                     <button id="req-${u.uid}" class="theme-bg text-white text-xs px-3 py-1 rounded-full font-bold">Add Friend</button>`;
                     container.appendChild(row);
+
                     document.getElementById(`req-${u.uid}`).onclick = () => {
                         set(ref(db, `requests/${u.uid}/${currentUser.uid}`), { fromId: currentUser.uid, fromName: currentUser.displayName, fromAvatar: currentUser.photoURL, fromEmail: currentUser.email });
                         alert('Friend Request Sent!');
@@ -863,7 +873,7 @@
             });
         }
 
-        // 📢 STORIES TIMELINE
+        // 📢 STORIES MANAGEMENT
         document.getElementById('btn-select-story-img').onclick = () => document.getElementById('story-image-input').click();
         document.getElementById('story-image-input').onchange = (e) => {
             const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { base64StoryImage = ev.target.result; document.getElementById('story-img-preview').innerHTML = `<img src="${base64StoryImage}" class="w-full h-24 object-cover rounded">`; document.getElementById('story-img-preview').classList.remove('hidden-pane'); }; reader.readAsDataURL(file); }
@@ -940,7 +950,5 @@
         }
     </script>
 </body>
-
-</html>
 
 </html>
