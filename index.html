@@ -1,156 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger Clone - Perfect UI</title>
+    <title>Messenger Pro - Ultimate Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <style>
         /* মেসেঞ্জার স্টাইল পিঙ্ক হার্ট ব্যাকগ্রাউন্ড */
         .messenger-bg {
             background: url('https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop') no-repeat center center;
             background-size: cover;
         }
-
-        /* স্ক্রিনশটের চ্যাট বাবলের নির্দিষ্ট কালার */
         .my-bubble {
             background-color: #D20062;
             color: white;
             border-radius: 18px 18px 4px 18px;
         }
-
         .friend-bubble {
             background-color: #F3F3F3;
             color: #000;
             border-radius: 18px 18px 18px 4px;
         }
-
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
         }
-
-        .hidden-pane {
-            display: none !important;
-        }
-
-        /* স্ক্রলবার হাইড করার জন্য */
-        .scrollbar-none::-webkit-scrollbar {
-            display: none;
-        }
-
-        .scrollbar-none {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .hidden-pane { display: none !important; }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-
 <body class="bg-gray-100 h-screen flex justify-center items-center font-sans">
 
     <div id="login-screen" class="w-full max-w-md p-6 bg-white rounded-2xl shadow-xl text-center">
-        <div
-            class="w-20 h-20 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-4xl mb-4 shadow-lg">
+        <div class="w-20 h-20 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white text-4xl mb-4 shadow-lg">
             <i class="fab fa-facebook-messenger"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to Messenger</h2>
-        <p class="text-gray-500 mb-6">Connect with Gmail & Firebase</p>
-        <button id="btn-google-login"
-            class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
+        <p class="text-gray-500 mb-6">Connect with Friends & Share Stories</p>
+        <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-1.14 2.77-2.4 3.63v3.02h3.88c2.27-2.09 3.57-5.17 3.57-8.5z" />
-                <path fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.11 0-5.74-2.11-6.68-4.96H1.21v3.11C3.18 21.88 7.31 24 12 24z" />
-                <path fill="#FBBC05"
-                    d="M5.32 14.27c-.24-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.62H1.21C.44 8.16 0 9.88 0 11.72s.44 3.56 1.21 5.1l4.11-3.11z" />
-                <path fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.93 1.19 15.22 0 12 0 7.31 0 3.18 2.12 1.21 5.41l4.11 3.11c.94-2.85 3.57-4.96 6.68-4.96z" />
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69c-.29 1.5-1.14 2.77-2.4 3.63v3.02h3.88c2.27-2.09 3.57-5.17 3.57-8.5z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.11 0-5.74-2.11-6.68-4.96H1.21v3.11C3.18 21.88 7.31 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.32 14.27c-.24-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.62H1.21C.44 8.16 0 9.88 0 11.72s.44 3.56 1.21 5.1l4.11-3.11z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.44-3.44C17.93 1.19 15.22 0 12 0 7.31 0 3.18 2.12 1.21 5.41l4.11 3.11c.94-2.85 3.57-4.96 6.68-4.96z"/>
             </svg>
             Sign in with Gmail
         </button>
     </div>
 
-    <div id="main-app"
-        class="w-full h-full max-w-md bg-white shadow-2xl flex flex-col hidden-pane relative overflow-hidden">
-
-        <div id="chat-list-pane" class="w-full h-full flex flex-col bg-white">
-
-            <div class="p-4 pb-2 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <img id="my-profile-pic" src="https://via.placeholder.com/40"
-                        class="w-10 h-10 rounded-full object-cover border cursor-pointer hover:opacity-80">
-                    <h1 class="text-2xl font-bold tracking-tight text-gray-900">Chats</h1>
-                </div>
-                <div class="flex items-center gap-3 text-gray-700">
-                    <button class="bg-gray-100 p-2.5 rounded-full w-9 h-9 flex items-center justify-center text-sm"><i
-                            class="fas fa-camera"></i></button>
-                    <button id="btn-logout"
-                        class="bg-gray-100 p-2.5 rounded-full w-9 h-9 flex items-center justify-center text-sm text-red-500"><i
-                            class="fas fa-sign-out-alt"></i></button>
-                </div>
+    <div id="main-app" class="w-full h-full max-w-md bg-white shadow-2xl flex flex-col hidden-pane relative overflow-hidden">
+        
+        <div class="p-4 pb-2 flex justify-between items-center border-b border-gray-50 bg-white">
+            <div class="flex items-center gap-3">
+                <img id="my-profile-pic" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full object-cover border">
+                <h1 id="page-title" class="text-2xl font-bold tracking-tight text-gray-900">Chats</h1>
             </div>
-
-            <div class="px-4 mb-3">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                    <input type="text" id="search-users" placeholder="Ask Meta AI or search by Gmail"
-                        class="w-full bg-gray-100 py-2.5 pl-11 pr-4 rounded-full text-sm focus:outline-none">
-                </div>
-                <div id="search-results"
-                    class="hidden-pane bg-gray-50 p-2 rounded-xl max-h-40 overflow-y-auto mt-2 border"></div>
+            <div class="flex items-center gap-3 text-gray-700">
+                <button class="bg-gray-100 p-2.5 rounded-full w-9 h-9 flex items-center justify-center text-sm"><i class="fas fa-camera"></i></button>
+                <button id="btn-logout" class="bg-gray-100 p-2.5 rounded-full w-9 h-9 flex items-center justify-center text-sm text-red-500"><i class="fas fa-sign-out-alt"></i></button>
             </div>
+        </div>
 
-            <div class="px-4 flex gap-4 overflow-x-auto pb-3 scrollbar-none border-b border-gray-100">
-                <div class="flex flex-col items-center flex-shrink-0 relative cursor-pointer">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12 rounded-full object-cover bg-gray-200">
-                    <span
-                        class="absolute bottom-5 right-0 bg-gray-300 text-gray-700 rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">+</span>
-                    <span class="text-xs mt-1 text-gray-400">Your story</span>
-                </div>
-                <div id="active-stories" class="flex gap-4"></div>
-            </div>
-
-            <div id="inbox-list" class="flex-1 overflow-y-auto divide-y divide-gray-50"></div>
-
-            <div class="border-t bg-white py-2 px-6 flex justify-between items-center text-gray-400">
-                <button class="flex flex-col items-center gap-0.5 text-pink-600">
-                    <i class="fas fa-comment text-xl"></i>
-                    <span class="text-[10px] font-semibold">Chats</span>
-                </button>
-                <button class="flex flex-col items-center gap-0.5 hover:text-gray-600">
-                    <i class="fas fa-users text-xl"></i>
-                    <span class="text-[10px] font-medium">People</span>
-                </button>
-                <button class="flex flex-col items-center gap-0.5 hover:text-gray-600">
-                    <div class="relative">
-                        <i class="fas fa-layer-group text-xl"></i>
-                        <span
-                            class="absolute -top-1 -right-1 bg-pink-500 w-2.5 h-2.5 rounded-full border-2 border-white"></span>
+        <div id="app-content-area" class="flex-1 overflow-y-auto">
+            
+            <div id="view-chats" class="h-full flex flex-col">
+                <div class="p-4 pb-0">
+                    <div class="relative mb-3">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                        <input type="text" id="search-users" placeholder="Search by name or Gmail" class="w-full bg-gray-100 py-2.5 pl-11 pr-4 rounded-full text-sm focus:outline-none">
                     </div>
-                    <span class="text-[10px] font-medium">Stories</span>
-                </button>
-                <button class="flex flex-col items-center gap-0.5 hover:text-gray-600">
-                    <i class="fas fa-compass text-xl"></i>
-                    <span class="text-[10px] font-medium">Discover</span>
-                </button>
+                    <div id="search-results" class="hidden-pane bg-gray-50 p-2 rounded-xl max-h-40 overflow-y-auto mb-2 border"></div>
+                    
+                    <div class="flex gap-4 overflow-x-auto pb-3 scrollbar-none">
+                        <div class="flex flex-col items-center flex-shrink-0 relative">
+                            <img src="https://via.placeholder.com/50" class="w-12 h-12 rounded-full object-cover">
+                            <span class="absolute bottom-5 right-0 bg-gray-300 text-gray-700 rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">+</span>
+                            <span class="text-xs mt-1 text-gray-400">Your story</span>
+                        </div>
+                        <div id="active-stories" class="flex gap-4"></div>
+                    </div>
+                </div>
+                <div id="inbox-list" class="flex-1 overflow-y-auto divide-y divide-gray-50"></div>
+            </div>
+
+            <div id="view-people" class="hidden-pane p-4 space-y-4">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wider">Friend Requests</h3>
+                    <div id="friend-requests-list" class="space-y-2 divide-y divide-gray-50"></div>
+                </div>
+                <div class="pt-2">
+                    <h3 class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wider">Your Friends</h3>
+                    <div id="friends-list" class="space-y-2 divide-y divide-gray-50"></div>
+                </div>
+            </div>
+
+            <div id="view-stories" class="hidden-pane flex flex-col h-full bg-gray-50">
+                <div class="bg-white p-4 shadow-sm border-b">
+                    <textarea id="story-bio" placeholder="Write something about your day..." class="w-full text-sm border border-gray-200 rounded-xl p-3 focus:outline-none resize-none h-16 bg-gray-50"></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <button id="btn-select-story-img" class="text-pink-600 flex items-center gap-2 text-sm font-medium"><i class="fas fa-image text-lg"></i> Add Photo</button>
+                        <input type="file" id="story-image-input" accept="image/*" class="hidden">
+                        <button id="btn-post-story" class="bg-pink-600 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow">Post</button>
+                    </div>
+                    <div id="story-img-preview" class="mt-2 hidden-pane max-h-24 overflow-hidden rounded-lg border"></div>
+                </div>
+                <div id="stories-feed" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+            </div>
+
+            <div id="view-discover" class="hidden-pane p-4">
+                <p class="text-xs text-gray-400 mb-4">Discover new users globally and send them a request to chat.</p>
+                <div id="discover-users-list" class="space-y-3 divide-y divide-gray-50"></div>
             </div>
 
         </div>
 
-        <div id="chat-box-pane" class="absolute inset-0 w-full h-full flex flex-col messenger-bg hidden-pane z-10">
+        <div class="border-t bg-white py-2 px-6 flex justify-between items-center text-gray-400 shadow-lg">
+            <button onclick="switchTab('chats')" id="nav-chats" class="flex flex-col items-center gap-0.5 text-pink-600">
+                <i class="fas fa-comment text-xl"></i>
+                <span class="text-[10px] font-semibold">Chats</span>
+            </button>
+            <button onclick="switchTab('people')" id="nav-people" class="flex flex-col items-center gap-0.5 hover:text-gray-600">
+                <i class="fas fa-users text-xl"></i>
+                <span class="text-[10px] font-medium">People</span>
+            </button>
+            <button onclick="switchTab('stories')" id="nav-stories" class="flex flex-col items-center gap-0.5 hover:text-gray-600">
+                <i class="fas fa-layer-group text-xl"></i>
+                <span class="text-[10px] font-medium">Stories</span>
+            </button>
+            <button onclick="switchTab('discover')" id="nav-discover" class="flex flex-col items-center gap-0.5 hover:text-gray-600">
+                <i class="fas fa-compass text-xl"></i>
+                <span class="text-[10px] font-medium">Discover</span>
+            </button>
+        </div>
+
+        <div id="chat-box-pane" class="absolute inset-0 w-full h-full flex flex-col messenger-bg hidden-pane z-30">
             <div class="glass-panel p-3 flex items-center justify-between border-b shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button id="back-to-list" class="text-pink-600 text-xl p-1"><i
-                            class="fas fa-chevron-left"></i></button>
+                    <button id="back-to-list" class="text-pink-600 text-xl p-1"><i class="fas fa-chevron-left"></i></button>
                     <div class="relative">
-                        <img id="chat-avatar" src="https://via.placeholder.com/40"
-                            class="w-10 h-10 rounded-full object-cover">
-                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full">
-                        </div>
+                        <img id="chat-avatar" src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full object-cover">
                     </div>
                     <div>
                         <h3 id="chat-username" class="font-bold text-gray-800 text-sm leading-tight">User Name</h3>
@@ -158,53 +149,26 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-5 text-pink-600 text-xl pr-2">
-                    <button id="btn-audio-call"><i class="fas fa-phone-alt"></i></button>
-                    <button id="btn-video-call"><i class="fas fa-video"></i></button>
+                    <button onclick="alert('Calling...')"><i class="fas fa-phone-alt"></i></button>
+                    <button onclick="alert('Starting video call...')"><i class="fas fa-video"></i></button>
                 </div>
             </div>
-
             <div id="message-container" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-
             <div class="glass-panel p-2 flex items-center gap-3 border-t">
                 <button class="text-pink-600 text-xl"><i class="fas fa-plus-circle"></i></button>
                 <button id="btn-send-image" class="text-pink-600 text-xl"><i class="fas fa-image"></i></button>
                 <input type="file" id="image-input" accept="image/*" class="hidden">
-                <button id="btn-voice-rec" class="text-pink-600 text-xl"><i class="fas fa-microphone"></i></button>
-
+                <button class="text-pink-600 text-xl"><i class="fas fa-microphone"></i></button>
                 <div class="flex-1 bg-gray-100 rounded-full px-4 py-2 flex items-center">
-                    <input type="text" id="msg-input" placeholder="Aa"
-                        class="w-full bg-transparent focus:outline-none text-sm">
-                    <button class="text-pink-600 text-lg ml-2"><i class="far fa-smile"></i></button>
+                    <input type="text" id="msg-input" placeholder="Aa" class="w-full bg-transparent focus:outline-none text-sm">
                 </div>
-
                 <button id="btn-send-msg" class="text-pink-600 text-xl pr-1"><i class="fas fa-thumbs-up"></i></button>
             </div>
         </div>
-
-        <div id="calling-screen"
-            class="absolute inset-0 bg-slate-900 z-50 flex flex-col items-center justify-between p-12 hidden-pane text-white">
-            <div class="text-center mt-10">
-                <img id="call-avatar" src="https://via.placeholder.com/120"
-                    class="w-28 h-28 rounded-full object-cover mx-auto ring-4 ring-pink-500 animate-pulse">
-                <h2 id="call-username" class="text-2xl font-bold mt-4">User Name</h2>
-                <p id="call-status" class="text-gray-400 text-sm mt-2">Calling...</p>
-            </div>
-            <div class="flex gap-6 mb-10">
-                <button id="btn-end-call"
-                    class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center text-xl hover:bg-red-700"><i
-                        class="fas fa-phone-slash"></i></button>
-            </div>
-        </div>
-
     </div>
 
-    <div id="msg-context-menu" class="absolute hidden-pane bg-white shadow-xl rounded-lg py-1 w-36 border text-sm z-50">
-        <button id="ctx-forward"
-            class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-gray-700"><i
-                class="fas fa-share"></i> Forward</button>
-        <button id="ctx-delete"
-            class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600"><i
-                class="fas fa-trash"></i> Delete</button>
+    <div id="msg-context-menu" class="absolute hidden-pane bg-white shadow-xl rounded-lg py-1 w-32 border text-sm z-50">
+        <button id="ctx-delete" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600"><i class="fas fa-trash"></i> Delete</button>
     </div>
 
     <script type="module">
@@ -213,15 +177,15 @@
         import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // 🔥 আপনার Firebase Credentials এখানে বসাবেন
+        // 🔥 আপনার Firebase কনফিগারেশন এখানে ইনপুট করুন
         const firebaseConfig = {
-            apiKey: "AIzaSyCvW1eM0TD2afTBDWWqmSHksQbm3Esjl2I",
-            authDomain: "tradingviews-77.firebaseapp.com",
-            projectId: "tradingviews-77",
-            storageBucket: "tradingviews-77.firebasestorage.app",
-            messagingSenderId: "277785483742",
-            appId: "1:277785483742:web:eea123b02bf1d2f987e54f",
-            measurementId: "G-BTR2FS9EY5"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -233,34 +197,36 @@
         let currentUser = null;
         let activeChatUser = null;
         let selectedMessageId = null;
+        let base64StoryImage = null;
 
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        const chatBoxPane = document.getElementById('chat-box-pane');
-        const msgInput = document.getElementById('msg-input');
-        const btnSendMsg = document.getElementById('btn-send-msg');
-        const msgContainer = document.getElementById('message-container');
-        const ctxMenu = document.getElementById('msg-context-menu');
-        const myProfilePic = document.getElementById('my-profile-pic');
+        // ট্যাব সুইচ করার গ্লোবাল ফাংশন
+        window.switchTab = function(tabName) {
+            const tabs = ['chats', 'people', 'stories', 'discover'];
+            tabs.forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden-pane');
+                document.getElementById(`nav-${t}`).classList.remove('text-pink-600');
+                document.getElementById(`nav-${t}`).classList.add('text-gray-400');
+            });
 
-        // গুগল লগইন
-        document.getElementById('btn-google-login').addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch(err => console.log(err));
-        });
+            document.getElementById(`view-${tabName}`).classList.remove('hidden-pane');
+            document.getElementById(`nav-${tabName}`).classList.add('text-pink-600');
+            document.getElementById('page-title').innerText = tabName.charAt(0).toUpperCase() + tabName.slice(1);
 
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            signOut(auth).then(() => location.reload());
-        });
+            if (tabName === 'discover') loadDiscoverUsers();
+            if (tabName === 'people') loadPeopleSection();
+            if (tabName === 'stories') loadStoriesTimeline();
+        };
 
-        // লগইন স্টেট হ্যান্ডলার
+        // Auth সিস্টেম
+        document.getElementById('btn-google-login').addEventListener('click', () => signInWithPopup(auth, provider));
+        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth).then(() => location.reload()));
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                loginScreen.classList.add('hidden-pane');
-                mainApp.classList.remove('hidden-pane');
-
-                // টপ লেফটে নিজের প্রোফাইল পিকচার সেট করা
-                myProfilePic.src = user.photoURL || 'https://via.placeholder.com/40';
+                document.getElementById('login-screen').classList.add('hidden-pane');
+                document.getElementById('main-app').classList.remove('hidden-pane');
+                document.getElementById('my-profile-pic').src = user.photoURL;
 
                 set(ref(db, 'users/' + user.uid), {
                     uid: user.uid,
@@ -271,77 +237,194 @@
 
                 loadChatList();
             } else {
-                loginScreen.classList.remove('hidden-pane');
-                mainApp.classList.add('hidden-pane');
+                document.getElementById('login-screen').classList.remove('hidden-pane');
+                document.getElementById('main-app').classList.add('hidden-pane');
             }
         });
 
-        // সার্চ লজিক
-        const searchInput = document.getElementById('search-users');
-        const searchResults = document.getElementById('search-results');
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toLowerCase();
-            if (query.length < 3) { searchResults.classList.add('hidden-pane'); return; }
-
+        // 1. DISCOVER TAB - সকল ইউজারদের তালিকা ও রিকোয়েস্ট অপশন
+        function loadDiscoverUsers() {
             onValue(ref(db, 'users'), (snapshot) => {
-                searchResults.innerHTML = '';
+                const container = document.getElementById('discover-users-list');
+                container.innerHTML = '';
                 const users = snapshot.val();
-                if (users) {
-                    Object.values(users).forEach(u => {
-                        if (u.uid !== currentUser.uid && (u.email.toLowerCase().includes(query) || u.name.toLowerCase().includes(query))) {
-                            searchResults.classList.remove('hidden-pane');
-                            const div = document.createElement('div');
-                            div.className = "flex justify-between items-center p-2 hover:bg-gray-100 rounded-lg text-sm";
-                            div.innerHTML = `
-                                <div class="flex items-center gap-2">
-                                    <img src="${u.avatar}" class="w-8 h-8 rounded-full">
-                                    <div><p class="font-semibold text-gray-800">${u.name}</p></div>
-                                </div>
-                                <button id="btn-chat-${u.uid}" class="bg-pink-600 text-white px-3 py-1 rounded-full text-xs">Chat</button>
-                            `;
-                            searchResults.appendChild(div);
+                if(!users) return;
 
-                            document.getElementById(`btn-chat-${u.uid}`).addEventListener('click', () => {
-                                startChatWith(u.uid, u.name, u.avatar);
-                            });
-                        }
+                Object.values(users).forEach(u => {
+                    if(u.uid === currentUser.uid) return;
+
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center py-3 border-b border-gray-50";
+                    row.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${u.avatar}" class="w-11 h-11 rounded-full border">
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-800">${u.name}</h4>
+                                <p class="text-xs text-gray-400">${u.email}</p>
+                            </div>
+                        </div>
+                        <button id="btn-req-${u.uid}" class="bg-pink-600 text-white text-xs px-4 py-1.5 rounded-full font-bold shadow hover:bg-pink-700 transition">Add Friend</button>
+                    `;
+                    container.appendChild(row);
+
+                    // রিকোয়েস্ট পাঠানো লজিক
+                    document.getElementById(`btn-req-${u.uid}`).addEventListener('click', () => {
+                        set(ref(db, `requests/${u.uid}/${currentUser.uid}`), {
+                            fromId: currentUser.uid,
+                            fromName: currentUser.displayName,
+                            fromAvatar: currentUser.photoURL
+                        }).then(() => alert('Friend request sent successfully!'));
+                    });
+                });
+            });
+        }
+
+        // 2. PEOPLE TAB - রিকোয়েস্ট এক্সেপ্ট এবং ফ্রেন্ড লিস্ট
+        function loadPeopleSection() {
+            // রিকোয়েস্ট রিসিভ লিস্ট
+            onValue(ref(db, `requests/${currentUser.uid}`), (snapshot) => {
+                const reqContainer = document.getElementById('friend-requests-list');
+                reqContainer.innerHTML = '';
+                const reqs = snapshot.val();
+                
+                if(!reqs) { reqContainer.innerHTML = '<p class="text-xs text-gray-400 py-1">No pending requests</p>'; }
+                else {
+                    Object.values(reqs).forEach(r => {
+                        const row = document.createElement('div');
+                        row.className = "flex justify-between items-center py-2";
+                        row.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <img src="${r.fromAvatar}" class="w-9 h-9 rounded-full">
+                                <span class="text-sm font-semibold text-gray-700">${r.fromName}</span>
+                            </div>
+                            <button id="btn-acc-${r.fromId}" class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold">Accept</button>
+                        `;
+                        reqContainer.appendChild(row);
+
+                        document.getElementById(`btn-acc-${r.fromId}`).addEventListener('click', () => {
+                            // ফ্রেন্ডলিস্টে এড করা (উভয় পাশে)
+                            set(ref(db, `friends/${currentUser.uid}/${r.fromId}`), true);
+                            set(ref(db, `friends/${r.fromId}/${currentUser.uid}`), true);
+                            // রিকোয়েস্ট ডিলিট করা
+                            remove(ref(db, `requests/${currentUser.uid}/${r.fromId}`));
+                            alert('Request accepted!');
+                        });
                     });
                 }
-            }, { onlyOnce: true });
+            });
+
+            // এক্সেপ্টেড ফ্রেন্ড লিস্ট লোড করা
+            onValue(ref(db, `friends/${currentUser.uid}`), (snapshot) => {
+                const friendsContainer = document.getElementById('friends-list');
+                friendsContainer.innerHTML = '';
+                const friendsData = snapshot.val();
+
+                if(!friendsData) { friendsContainer.innerHTML = '<p class="text-xs text-gray-400 py-1">No friends added yet.</p>'; return; }
+
+                Object.keys(friendsData).forEach(friendUid => {
+                    onValue(ref(db, `users/${friendUid}`), (uSnap) => {
+                        const u = uSnap.val();
+                        if(!u) return;
+                        const row = document.createElement('div');
+                        row.className = "flex justify-between items-center py-3 cursor-pointer hover:bg-gray-50 px-1 rounded-lg";
+                        row.innerHTML = `
+                            <div class="flex items-center gap-3">
+                                <img src="${u.avatar}" class="w-10 h-10 rounded-full border">
+                                <span class="text-sm font-bold text-gray-800">${u.name}</span>
+                            </div>
+                            <span class="text-green-500 text-xs flex items-center gap-1"><i class="fas fa-circle text-[9px]"></i> Active</span>
+                        `;
+                        row.onclick = () => startChatWith(u.uid, u.name, u.avatar);
+                        friendsContainer.appendChild(row);
+                    }, { onlyOnce: true });
+                });
+            });
+        }
+
+        // 3. STORIES TAB - বায়ো এবং পিকচার দিয়ে টাইমলাইন পোস্ট
+        document.getElementById('btn-select-story-img').addEventListener('click', () => document.getElementById('story-image-input').click());
+        document.getElementById('story-image-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    base64StoryImage = event.target.result;
+                    const preview = document.getElementById('story-img-preview');
+                    preview.innerHTML = `<img src="${base64StoryImage}" class="w-full object-cover">`;
+                    preview.classList.remove('hidden-pane');
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        window.startChatWith = function (uid, name, avatar) {
-            activeChatUser = { uid, name, avatar };
-            searchResults.classList.add('hidden-pane');
-            searchInput.value = '';
+        document.getElementById('btn-post-story').addEventListener('click', () => {
+            const bio = document.getElementById('story-bio').value.trim();
+            if(!bio && !base64StoryImage) return alert('Please write a status or add a photo!');
 
+            const newStoryRef = push(ref(db, 'stories'));
+            set(newStoryRef, {
+                userName: currentUser.displayName,
+                userAvatar: currentUser.photoURL,
+                bio: bio,
+                image: base64StoryImage || null,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('story-bio').value = '';
+                document.getElementById('story-img-preview').classList.add('hidden-pane');
+                base64StoryImage = null;
+                alert('Story posted to feed!');
+            });
+        });
+
+        function loadStoriesTimeline() {
+            onValue(ref(db, 'stories'), (snapshot) => {
+                const container = document.getElementById('stories-feed');
+                container.innerHTML = '';
+                const list = snapshot.val();
+                if(!list) { container.innerHTML = '<p class="text-center text-xs text-gray-400 mt-10">No stories shared yet.</p>'; return; }
+
+                Object.values(list).reverse().forEach(s => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <img src="${s.userAvatar}" class="w-9 h-9 rounded-full">
+                            <div>
+                                <h5 class="text-sm font-bold text-gray-800">${s.userName}</h5>
+                                <p class="text-[10px] text-gray-400">${new Date(s.timestamp).toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        ${s.bio ? `<p class="text-sm text-gray-700 leading-relaxed">${s.bio}</p>` : ''}
+                        ${s.image ? `<img src="${s.image}" class="w-full rounded-lg max-h-64 object-cover border">` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        // 4. CHATS TAB - লাইভ চ্যাটিং ইঞ্জিন ও পূর্বের লজিকসমূহ
+        window.startChatWith = function(uid, name, avatar) {
+            activeChatUser = { uid, name, avatar };
             document.getElementById('chat-username').innerText = name;
             document.getElementById('chat-avatar').src = avatar;
-            chatBoxPane.classList.remove('hidden-pane');
-
+            document.getElementById('chat-box-pane').classList.remove('hidden-pane');
             listenToMessages();
         };
 
         document.getElementById('back-to-list').addEventListener('click', () => {
-            chatBoxPane.classList.add('hidden-pane');
+            document.getElementById('chat-box-pane').classList.add('hidden-pane');
             activeChatUser = null;
         });
 
-        msgInput.addEventListener('input', (e) => {
-            btnSendMsg.innerHTML = e.target.value.trim().length > 0 ? '<i class="fas fa-paper-plane"></i>' : '<i class="fas fa-thumbs-up"></i>';
-        });
-
-        btnSendMsg.addEventListener('click', sendMessage);
-        msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        document.getElementById('btn-send-msg').addEventListener('click', sendMessage);
+        msgInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 
         function sendMessage() {
             const text = msgInput.value.trim();
-            if (!activeChatUser) return;
+            if(!activeChatUser) return;
 
             const chatRoomId = currentUser.uid < activeChatUser.uid ? `${currentUser.uid}_${activeChatUser.uid}` : `${activeChatUser.uid}_${currentUser.uid}`;
-            const messageRef = ref(db, 'messages/' + chatRoomId);
-            const newMessageRef = push(messageRef);
+            const newMessageRef = push(ref(db, 'messages/' + chatRoomId));
 
             set(newMessageRef, {
                 id: newMessageRef.key,
@@ -350,31 +433,29 @@
                 type: 'text',
                 timestamp: Date.now()
             });
-
             msgInput.value = '';
-            btnSendMsg.innerHTML = '<i class="fas fa-thumbs-up"></i>';
         }
 
         function listenToMessages() {
-            if (!activeChatUser) return;
+            if(!activeChatUser) return;
             const chatRoomId = currentUser.uid < activeChatUser.uid ? `${currentUser.uid}_${activeChatUser.uid}` : `${activeChatUser.uid}_${currentUser.uid}`;
-
+            
             onValue(ref(db, 'messages/' + chatRoomId), (snapshot) => {
                 msgContainer.innerHTML = '';
                 const data = snapshot.val();
-                if (data) {
+                if(data) {
                     Object.values(data).forEach(msg => {
                         const isMe = msg.sender_id === currentUser.uid;
                         const wrapper = document.createElement('div');
                         wrapper.className = `flex ${isMe ? 'justify-end' : 'justify-start'} w-full mb-1`;
-
-                        let innerContent = msg.type === 'image'
-                            ? `<img src="${msg.content}" class="max-w-[200px] rounded-xl shadow-sm cursor-pointer">`
+                        
+                        let innerContent = msg.type === 'image' 
+                            ? `<img src="${msg.content}" class="max-w-[200px] rounded-xl border">`
                             : `<p class="px-4 py-2 text-sm shadow-sm ${isMe ? 'my-bubble' : 'friend-bubble'}">${msg.content}</p>`;
 
                         const msgDiv = document.createElement('div');
                         msgDiv.innerHTML = innerContent;
-
+                        
                         msgDiv.addEventListener('contextmenu', (e) => {
                             e.preventDefault();
                             selectedMessageId = { room: chatRoomId, msgId: msg.id };
@@ -393,14 +474,12 @@
 
         document.addEventListener('click', () => ctxMenu.classList.add('hidden-pane'));
         document.getElementById('ctx-delete').addEventListener('click', () => {
-            if (selectedMessageId) {
-                remove(ref(db, `messages/${selectedMessageId.room}/${selectedMessageId.msgId}`));
-            }
+            if(selectedMessageId) remove(ref(db, `messages/${selectedMessageId.room}/${selectedMessageId.msgId}`));
         });
 
+        // চ্যাট ইমেজ সেন্ডিং
         const imageInput = document.getElementById('image-input');
         document.getElementById('btn-send-image').addEventListener('click', () => imageInput.click());
-
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && activeChatUser) {
@@ -421,21 +500,21 @@
             }
         });
 
+        // সাইড ইনবক্স এবং একটিভ বাবল লিস্ট লোড করা 
         function loadChatList() {
             onValue(ref(db, 'users'), (snapshot) => {
                 const inboxList = document.getElementById('inbox-list');
                 const activeStories = document.getElementById('active-stories');
                 inboxList.innerHTML = '';
                 activeStories.innerHTML = '';
-
                 const users = snapshot.val();
-                if (users) {
+                if(users) {
                     Object.values(users).forEach(p => {
-                        if (p.uid !== currentUser.uid) {
+                        if(p.uid !== currentUser.uid) {
                             const item = document.createElement('div');
                             item.className = "flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition";
                             item.innerHTML = `
-                                <img src="${p.avatar}" class="w-12 h-12 rounded-full object-cover">
+                                <img src="${p.avatar}" class="w-12 h-12 rounded-full object-cover border">
                                 <div class="flex-1">
                                     <div class="flex justify-between items-baseline">
                                         <h4 class="font-semibold text-gray-900 text-sm">${p.name}</h4>
@@ -463,19 +542,7 @@
                 }
             });
         }
-
-        const callScreen = document.getElementById('calling-screen');
-        document.getElementById('btn-audio-call').addEventListener('click', () => initCall());
-        document.getElementById('btn-video-call').addEventListener('click', () => initCall());
-        document.getElementById('btn-end-call').addEventListener('click', () => callScreen.classList.add('hidden-pane'));
-
-        function initCall() {
-            document.getElementById('call-username').innerText = activeChatUser.name;
-            document.getElementById('call-avatar').src = activeChatUser.avatar;
-            callScreen.classList.remove('hidden-pane');
-        }
     </script>
 </body>
-
 </html>
    
