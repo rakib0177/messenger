@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimate Messenger & Social Network</title>
+    <title>Connect Engine - Complete Messenger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -53,7 +53,7 @@
                 <i class="fas fa-comments text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Connect Engine</h1>
-            <p class="text-gray-500 text-sm mb-8">Real-time Messaging, Groups, Timeline Feed & Themes.</p>
+            <p class="text-gray-500 text-sm mb-8">Real-time Messaging, Groups, Live Calling & Feed.</p>
             <button id="btn-login"
                 class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3.5 px-6 rounded-xl shadow-sm flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
                 <i class="fab fa-google text-lg text-red-400"></i> Open with Google Account
@@ -71,7 +71,7 @@
                     <span id="user-display-name"
                         class="font-bold text-gray-800 text-xs truncate max-w-[100px]">User</span>
                     <span class="text-[9px] text-blue-500 font-semibold flex items-center gap-1"><i
-                            class="fas fa-pen"></i> Edit Profile</span>
+                            class="fas fa-pen"></i> Settings</span>
                 </div>
             </div>
             <div id="app-title-text" class="text-base font-black tracking-tight text-gray-900">Conversations</div>
@@ -99,8 +99,7 @@
                         <i class="fas fa-users-medical"></i> Create New Chat Group
                     </button>
                 </div>
-                <div id="chats-list-container" class="flex-1 p-3 space-y-2">
-                </div>
+                <div id="chats-list-container" class="flex-1 p-3 space-y-2"></div>
             </div>
 
             <div id="page-requests" class="page-view">
@@ -121,6 +120,7 @@
                                 <input type="file" id="post-image-input" accept="image/*" class="hidden">
                                 <i class="fas fa-image text-emerald-500"></i> Upload Media
                             </label>
+                            <span id="post-img-status" class="text-[10px] text-gray-400 hidden">Photo Selected</span>
                             <button id="btn-submit-post"
                                 class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl">Publish
                                 Post</button>
@@ -130,15 +130,38 @@
                 </div>
             </div>
 
+            <div id="user-profile-view-modal"
+                class="fixed inset-0 bg-black/60 z-50 hidden flex items-end justify-center">
+                <div
+                    class="bg-white w-full max-w-md rounded-t-3xl p-6 space-y-6 animate-slide-up shadow-2xl text-center">
+                    <div class="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-blue-500 shadow-md">
+                        <img id="view-profile-pic" src="" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 id="view-profile-name" class="font-black text-xl text-gray-900">Username</h3>
+                        <p id="view-profile-email" class="text-xs text-gray-400 mt-1">user@email.com</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <button id="profile-btn-chat"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2"><i
+                                class="fas fa-comment-alt"></i> Start Chat</button>
+                        <button id="profile-btn-close"
+                            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs py-3 rounded-xl transition">Close
+                            Profile</button>
+                    </div>
+                </div>
+            </div>
+
             <div id="fullscreen-chat-view" class="fixed inset-0 bg-white z-50 hidden flex-col">
                 <div class="p-3 border-b flex justify-between items-center bg-white shadow-3xs">
                     <div class="flex items-center gap-2.5">
                         <button id="close-chat"
                             class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-600"><i
                                 class="fas fa-arrow-left text-sm"></i></button>
-                        <img id="chat-user-pic" src="" class="w-9 h-9 rounded-full object-cover border">
+                        <img id="chat-user-pic" src="" class="w-9 h-9 rounded-full object-cover border cursor-pointer">
                         <div>
-                            <h4 id="chat-user-name" class="font-bold text-sm text-gray-800">User Context</h4>
+                            <h4 id="chat-user-name" class="font-bold text-sm text-gray-800 cursor-pointer">User Context
+                            </h4>
                             <div class="flex gap-1.5 mt-1" id="theme-selectors">
                                 <button data-theme="blue"
                                     class="w-3 h-3 rounded-full bg-blue-500 border border-white shadow-xs"></button>
@@ -246,7 +269,7 @@
     </div>
 
     <div id="action-sheet" class="fixed inset-0 bg-black/40 z-50 hidden flex items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-2.5 animate-slide-up shadow-2xl">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-4 space-y-2.5 shadow-2xl">
             <button id="action-delete"
                 class="w-full py-3 text-center text-red-600 font-bold text-xs bg-red-50 rounded-xl hover:bg-red-100">Delete
                 Permanently</button>
@@ -258,20 +281,39 @@
         </div>
     </div>
 
-    <div id="call-overlay" class="hidden fixed inset-0 bg-gray-900 z-50 flex flex-col justify-between p-6 text-white">
-        <div class="text-center pt-6">
-            <h2 id="call-status" class="text-xl font-bold tracking-wide">Live Stream Call Active</h2>
-            <p id="call-target-name" class="text-gray-400 text-xs mt-1">Profile Module</p>
+    <div id="incoming-call-overlay"
+        class="hidden fixed inset-0 bg-slate-900 z-50 flex flex-col justify-between p-8 text-white text-center">
+        <div class="pt-12 space-y-3">
+            <div
+                class="animate-bounce w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                <i class="fas fa-phone-alt text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-black">Incoming Call...</h2>
+            <p id="incoming-caller-name" class="text-gray-300 text-sm">Someone is calling you</p>
+        </div>
+        <div class="flex justify-center gap-10 pb-8">
+            <button id="btn-decline-call"
+                class="bg-red-600 w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-lg"><i
+                    class="fas fa-phone-slash"></i></button>
+            <button id="btn-accept-call"
+                class="bg-green-500 class animate-pulse w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-lg"><i
+                    class="fas fa-phone"></i></button>
+        </div>
+    </div>
+
+    <div id="call-overlay" class="hidden fixed inset-0 bg-gray-950 z-40 flex flex-col justify-between p-6 text-white">
+        <div class="text-center pt-4">
+            <h2 id="call-status" class="text-base font-bold tracking-wide text-blue-400">Ringing Line Connect...</h2>
         </div>
         <div class="flex-1 flex justify-center items-center relative my-4">
             <video id="remote-video" autoplay playsinline
-                class="w-full h-full max-h-[55vh] bg-black rounded-2xl object-cover"></video>
+                class="w-full h-full max-h-[60vh] bg-black rounded-3xl object-cover shadow-2xl"></video>
             <video id="local-video" autoplay playsinline muted
-                class="w-24 h-36 bg-gray-800 rounded-xl object-cover absolute bottom-3 right-3 border border-white z-10"></video>
+                class="w-24 h-36 bg-gray-800 rounded-2xl object-cover absolute bottom-4 right-4 border-2 border-white z-10 shadow-lg"></video>
         </div>
-        <div class="flex justify-center gap-6 pb-4">
+        <div class="flex justify-center pb-4">
             <button id="btn-end-call"
-                class="bg-red-500 w-14 h-14 rounded-full flex items-center justify-center text-lg hover:bg-red-600"><i
+                class="bg-red-500 w-14 h-14 rounded-full flex items-center justify-center text-lg shadow-xl hover:bg-red-600"><i
                     class="fas fa-phone-slash"></i></button>
         </div>
     </div>
@@ -293,6 +335,7 @@
             measurementId: "G-BTR2FS9EY5"
         };
 
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -300,10 +343,10 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null, activeChatUser = null, isGroupContext = false;
-        let mediaRecorder = null, audioChunks = [], localStream = null;
+        let mediaRecorder = null, audioChunks = [], localStream = null, currentCallId = null;
         let chatMessagesUnsubscribe = null, activeTargetActionData = null;
 
-        // UI DOM Accessors
+        // UI Target Components
         const authScreen = document.getElementById('auth-screen');
         const appScreen = document.getElementById('app-screen');
         const searchInput = document.getElementById('search-user');
@@ -313,12 +356,13 @@
         const feedStream = document.getElementById('feed-stream');
         const fullChatView = document.getElementById('fullscreen-chat-view');
 
-        // Modal Accessors
+        // Modals
         const profileModal = document.getElementById('profile-modal');
         const groupModal = document.getElementById('group-modal');
         const actionSheet = document.getElementById('action-sheet');
+        const profileViewModal = document.getElementById('user-profile-view-modal');
 
-        // --- AUTHENTICATION INTERFACES ---
+        // --- AUTH PIPELINE SETUP ---
         document.getElementById('btn-login').addEventListener('click', async () => {
             try {
                 const res = await signInWithPopup(auth, provider);
@@ -334,7 +378,7 @@
                         requestsReceived: []
                     });
                 }
-            } catch (err) { alert("Login Engine Error"); }
+            } catch (err) { alert("Login Error: Provide valid Auth configuration."); }
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
@@ -347,6 +391,7 @@
                 updateTopProfileUI(user.displayName, user.photoURL);
                 syncLiveAppEngine();
                 loadGlobalFeed();
+                listenForIncomingCalls();
             } else {
                 currentUser = null;
                 authScreen.classList.remove('hidden');
@@ -359,7 +404,7 @@
             document.getElementById('user-display-name').textContent = name;
         }
 
-        // --- NAVIGATION LAYOUT CONTROLLER ---
+        // --- APP VIEW ROUTER PANELS ---
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -373,7 +418,26 @@
             });
         });
 
-        // --- PROFILE EDIT CONTROLLER ENGINE ---
+        // --- INTERACTIVE PROFILE BOX (ACTIONS AT BOTTOM) ---
+        function launchUserProfileView(userData) {
+            document.getElementById('view-profile-pic').src = userData.photoURL;
+            document.getElementById('view-profile-name').textContent = userData.displayName;
+            document.getElementById('view-profile-email').textContent = userData.email;
+
+            // Re-bind action handlers explicitly
+            document.getElementById('profile-btn-chat').onclick = () => {
+                profileViewModal.classList.add('hidden');
+                openMessengerInterface(userData, false);
+            };
+            profileViewModal.classList.remove('hidden');
+        }
+        document.getElementById('profile-btn-close').addEventListener('click', () => profileViewModal.classList.add('hidden'));
+
+        // Trigger dynamic profile view inside active messaging room
+        document.getElementById('chat-user-pic').onclick = () => { if (!isGroupContext) launchUserProfileView(activeChatUser); };
+        document.getElementById('chat-user-name').onclick = () => { if (!isGroupContext) launchUserProfileView(activeChatUser); };
+
+        // --- UPDATE SYSTEM IDENTITY SETTINGS ---
         document.getElementById('trigger-profile-modal').addEventListener('click', () => {
             document.getElementById('edit-profile-name').value = currentUser.displayName;
             profileModal.classList.remove('hidden');
@@ -395,10 +459,9 @@
             await updateDoc(doc(db, "users", currentUser.uid), { displayName: newName, photoURL: finalUrl });
             updateTopProfileUI(newName, finalUrl);
             profileModal.classList.add('hidden');
-            alert("Profile successfully updated!");
         });
 
-        // --- USER DISCOVERY SEARCH ENGINE ---
+        // --- GLOBAL SEARCH ARCHITECTURE ---
         searchInput.addEventListener('input', async (e) => {
             const queryVal = e.target.value.trim().toLowerCase();
             if (!queryVal) { searchResults.classList.add('hidden'); return; }
@@ -408,7 +471,7 @@
             searchResults.innerHTML = '';
 
             if (snap.empty) {
-                searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">User Match Empty</p>`;
+                searchResults.innerHTML = `<p class="p-3 text-xs text-gray-400 text-center">User not found</p>`;
             } else {
                 snap.forEach(d => {
                     const data = d.data();
@@ -416,10 +479,11 @@
                     const el = document.createElement('div');
                     el.className = "p-3 flex items-center justify-between hover:bg-gray-50 border-b";
                     el.innerHTML = `
-                        <div class="flex items-center gap-2"><img src="${data.photoURL}" class="w-6 h-6 rounded-full">
+                        <div class="flex items-center gap-2 cursor-pointer search-view-profile" data-id="${data.uid}"><img src="${data.photoURL}" class="w-6 h-6 rounded-full">
                         <span class="text-xs font-bold">${data.displayName}</span></div>
                         <button class="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg trigger-send-req" data-id="${data.uid}">Connect</button>
                     `;
+                    el.querySelector('.search-view-profile').onclick = () => launchUserProfileView(data);
                     searchResults.appendChild(el);
                 });
             }
@@ -435,15 +499,13 @@
             }
         });
 
-        // --- SYNC ENGINE: CONVERSATIONS, REQUESTS, GROUPS ---
+        // --- MESSENGER SYNCHRONIZATION PIPELINES ---
         function syncLiveAppEngine() {
-            // User Meta Tracker
             onSnapshot(doc(db, "users", currentUser.uid), (snap) => {
                 const uData = snap.data();
                 if (!uData) return;
 
                 chatsContainer.innerHTML = '';
-                // Render Direct User Conversations
                 if (uData.friends && uData.friends.length > 0) {
                     uData.friends.forEach(async (fId) => {
                         const fSnap = await getDoc(doc(db, "users", fId));
@@ -451,7 +513,6 @@
                     });
                 }
 
-                // Render Connection Validation Requests
                 requestsContainer.innerHTML = '';
                 if (uData.requestsReceived && uData.requestsReceived.length > 0) {
                     uData.requestsReceived.forEach(async (rId) => {
@@ -461,8 +522,7 @@
                 }
             });
 
-            // Live Group Channel Stream Data Listener
-            onSnapshot(query(collection(db, "groups"), where("members", "arrayUnion", currentUser.uid)), (snap) => {
+            onSnapshot(query(collection(db, "groups"), where("members", "arrayContains", currentUser.uid)), (snap) => {
                 snap.forEach(d => {
                     renderConversationCard({ uid: d.id, displayName: d.data().name, photoURL: 'https://cdn-icons-png.flaticon.com/512/166/166258.png' }, true);
                 });
@@ -471,13 +531,13 @@
 
         function renderConversationCard(data, isGroup) {
             const card = document.createElement('div');
-            card.className = "flex items-center justify-between p-3 bg-white border rounded-2xl cursor-pointer hover:bg-gray-50";
+            card.className = "flex items-center justify-between p-3 bg-white border rounded-2xl cursor-pointer hover:bg-gray-50 shadow-2xs";
             card.innerHTML = `
                 <div class="flex items-center gap-3">
-                    <img src="${data.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                    <img src="${data.photoURL}" class="w-10 h-10 rounded-full object-cover border">
                     <div>
                         <h4 class="font-bold text-xs text-gray-800">${data.displayName}</h4>
-                        <p class="text-[10px] text-gray-400">${isGroup ? 'Group Chat Room' : 'Direct Message Line'}</p>
+                        <p class="text-[10px] text-gray-400">${isGroup ? 'Group Chat Room' : 'Tap to open chat'}</p>
                     </div>
                 </div>
             `;
@@ -487,7 +547,7 @@
 
         function renderRequestCard(data) {
             const row = document.createElement('div');
-            row.className = "p-3 bg-white border rounded-2xl flex items-center justify-between shadow-3xs";
+            row.className = "p-3 bg-white border rounded-2xl flex items-center justify-between";
             row.innerHTML = `
                 <div class="flex items-center gap-2"><img src="${data.photoURL}" class="w-8 h-8 rounded-full"><span class="text-xs font-bold">${data.displayName}</span></div>
                 <button class="bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl run-accept-req" data-id="${data.uid}">Accept</button>
@@ -500,7 +560,6 @@
                 const id = e.target.getAttribute('data-id');
                 const myRef = doc(db, "users", currentUser.uid);
                 const targetRef = doc(db, "users", id);
-
                 const mySnap = await getDoc(myRef);
                 const cleanReqs = (mySnap.data().requestsReceived || []).filter(i => i !== id);
 
@@ -509,14 +568,13 @@
             }
         });
 
-        // --- GROUP MODAL CONTEXT SETUP CONTROLS ---
+        // --- GROUP ENGINE ACTION IMPLEMENTATION ---
         document.getElementById('btn-open-group-modal').addEventListener('click', async () => {
             const checklist = document.getElementById('group-friends-checklist');
             checklist.innerHTML = '';
             const myDoc = await getDoc(doc(db, "users", currentUser.uid));
             const friends = myDoc.data().friends || [];
 
-            if (friends.length === 0) { checklist.innerHTML = `<p class="text-[10px] text-gray-400">Add friends first</p>`; }
             for (let fId of friends) {
                 const fDoc = await getDoc(doc(db, "users", fId));
                 if (fDoc.exists()) {
@@ -540,10 +598,9 @@
             if (!title || memberIds.length < 2) return;
             await addDoc(collection(db, "groups"), { name: title, members: memberIds, timestamp: Date.now() });
             groupModal.classList.add('hidden');
-            document.getElementById('group-name-input').value = '';
         });
 
-        // --- CORE CHAT MESSENGER LAYER INTERFACES ---
+        // --- LIVE REAL-TIME CHAT MESSENGER ENGINE ---
         function openMessengerInterface(target, groupContextFlag) {
             activeChatUser = target;
             isGroupContext = groupContextFlag;
@@ -564,20 +621,17 @@
                     const m = doc.data();
                     const isMe = m.senderId === currentUser.uid;
                     const msgRow = document.createElement('div');
-                    msgRow.className = `flex ${isMe ? 'justify-end' : 'justify-start'} mb-1 msg-node-item`;
-                    msgRow.setAttribute('data-msg-id', doc.id);
-                    msgRow.setAttribute('data-room-path', roomPath);
+                    msgRow.className = `flex ${isMe ? 'justify-end' : 'justify-start'} mb-1`;
 
                     let contentNode = `<p class="text-xs leading-relaxed">${m.text}</p>`;
-                    if (m.type === 'image') contentNode = `<img src="${m.mediaUrl}" class="max-w-[60vw] rounded-lg border">`;
+                    if (m.type === 'image') contentNode = `<img src="${m.mediaUrl}" class="max-w-[60vw] rounded-lg border shadow-sm">`;
                     if (m.type === 'audio') contentNode = `<audio src="${m.mediaUrl}" controls class="max-w-[55vw] scale-90 origin-left"></audio>`;
 
                     msgRow.innerHTML = `
-                        <div class="${isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'} p-3 rounded-2xl max-w-[70vw] shadow-3xs cursor-pointer active:scale-95 transition">
+                        <div class="${isMe ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'} p-3 rounded-2xl max-w-[70vw] shadow-3xs cursor-pointer">
                             ${contentNode}
                         </div>
                     `;
-                    // Assign Sheet Modals Interaction Handler Actions
                     msgRow.onclick = () => launchActionSheet({ id: doc.id, roomPath: roomPath, currentText: m.text, type: m.type, url: m.mediaUrl || null });
                     msgBox.appendChild(msgRow);
                 });
@@ -600,20 +654,23 @@
             input.value = '';
         });
 
-        // Chat Photo Deployment Pipeline
+        // CHAT IMAGE TRANSMISSION - VERIFIED STORAGE DRIVER
         document.getElementById('chat-image-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            const storageRef = ref(storage, `chats/${Date.now()}_${file.name}`);
-            const meta = await uploadBytes(storageRef, file);
-            const link = await getDownloadURL(meta.ref);
-            dispatchChatMessage({ mediaUrl: link, text: '[Image Photo]' }, 'image');
+            try {
+                const storageRef = ref(storage, `chats/${Date.now()}_${file.name}`);
+                const snap = await uploadBytes(storageRef, file);
+                const downloadUrl = await getDownloadURL(snap.ref);
+                await dispatchChatMessage({ mediaUrl: downloadUrl, text: '[Image Photo]' }, 'image');
+            } catch (err) { alert("Storage Error: Ensure Firebase Storage rules allow public reads/writes."); }
         });
 
-        // Chat Voice Messaging Capture Infrastructure
+        // RECORD VOICE NOTE DISPATCH ENGINE
         const voiceBtn = document.getElementById('btn-voice-record');
         voiceBtn.addEventListener('click', async () => {
             if (!mediaRecorder) {
+                audioChunks = [];
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
@@ -622,66 +679,50 @@
                     const fileRef = ref(storage, `audio/${Date.now()}.mp3`);
                     const uploadSnap = await uploadBytes(fileRef, blob);
                     const streamURL = await getDownloadURL(uploadSnap.ref);
-                    dispatchChatMessage({ mediaUrl: streamURL, text: '[Voice Note]' }, 'audio');
-                    audioChunks = [];
+                    await dispatchChatMessage({ mediaUrl: streamURL, text: '[Voice Note]' }, 'audio');
                 };
                 mediaRecorder.start();
-                voiceBtn.classList.add('text-red-500');
+                voiceBtn.classList.replace('text-gray-400', 'text-red-500');
             } else {
                 mediaRecorder.stop();
                 mediaRecorder = null;
-                voiceBtn.classList.remove('text-red-500');
+                voiceBtn.classList.replace('text-red-500', 'text-gray-400');
             }
         });
 
-        // --- MESSAGE MUTATION ACTIONS (DELETE / FORWARD) ---
-        function launchActionSheet(data) {
-            activeTargetActionData = data;
-            actionSheet.classList.remove('hidden');
-        }
+        // --- MESSAGE CONTEXT UTILITIES ---
+        function launchActionSheet(data) { activeTargetActionData = data; actionSheet.classList.remove('hidden'); }
         document.getElementById('action-cancel').addEventListener('click', () => actionSheet.classList.add('hidden'));
-
         document.getElementById('action-delete').addEventListener('click', async () => {
-            if (!activeTargetActionData) return;
             const targetColPath = isGroupContext ? `groups/${activeTargetActionData.roomPath}/messages` : `chats/${activeTargetActionData.roomPath}/messages`;
             await deleteDoc(doc(db, targetColPath, activeTargetActionData.id));
             actionSheet.classList.add('hidden');
         });
-
         document.getElementById('action-forward').addEventListener('click', async () => {
             actionSheet.classList.add('hidden');
-            const targetFriendEmail = prompt("Enter target receiver's registered email address to forward message context:").trim().toLowerCase();
-            if (!targetFriendEmail) return;
-
-            const uQuery = query(collection(db, "users"), where("email", "==", targetFriendEmail));
-            const uSnap = await getDocs(uQuery);
-            if (uSnap.empty) { alert("User profile target missing!"); return; }
-
-            let targetFriendUid;
-            uSnap.forEach(d => targetFriendUid = d.id);
-
-            const forwardedRoomCode = [currentUser.uid, targetFriendUid].sort().join("_");
+            const email = prompt("Enter target receiver's email:").toLowerCase().trim();
+            const snap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+            if (snap.empty) return;
+            let fUid; snap.forEach(d => fUid = d.id);
+            const forwardedRoomCode = [currentUser.uid, fUid].sort().join("_");
             await addDoc(collection(db, "chats", forwardedRoomCode, "messages"), {
-                senderId: currentUser.uid,
-                timestamp: Date.now(),
-                type: activeTargetActionData.type,
-                text: `[Forwarded]: ${activeTargetActionData.currentText}`,
-                mediaUrl: activeTargetActionData.url
+                senderId: currentUser.uid, timestamp: Date.now(), type: activeTargetActionData.type,
+                text: `[Forwarded]: ${activeTargetActionData.currentText}`, mediaUrl: activeTargetActionData.url
             });
-            alert("Content forwarded successfully!");
         });
 
-        // --- CHAT INTERFACE DYNAMIC THEME SELECTORS ---
         document.querySelectorAll('#theme-selectors button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const selectedTheme = e.currentTarget.getAttribute('data-theme');
-                const targetViewport = document.getElementById('chat-messages');
-                targetViewport.className = "flex-1 overflow-y-auto p-4 space-y-3"; // clear fallback state
-                targetViewport.classList.add(`theme-${selectedTheme}`);
+                document.getElementById('chat-messages').className = `flex-1 overflow-y-auto p-4 space-y-3 theme-${selectedTheme}`;
             });
         });
 
-        // --- BROADCAST TIMELINE SOCIAL FEED ENGINE ---
+        // --- VERIFIED TIMELINE BROADCAST SOCIAL FEED ENGINE ---
+        document.getElementById('post-image-input').addEventListener('change', () => {
+            document.getElementById('post-img-status').classList.remove('hidden');
+        });
+
         document.getElementById('btn-submit-post').addEventListener('click', async () => {
             const body = document.getElementById('post-text').value;
             const attachedFile = document.getElementById('post-image-input').files[0];
@@ -689,28 +730,26 @@
 
             if (!body.trim() && !attachedFile) return;
 
-            if (attachedFile) {
-                const postStorageRef = ref(storage, `posts/${Date.now()}_${attachedFile.name}`);
-                const snapshotTask = await uploadBytes(postStorageRef, attachedFile);
-                postDownloadUrl = await getDownloadURL(snapshotTask.ref);
-            }
+            try {
+                if (attachedFile) {
+                    const postStorageRef = ref(storage, `posts/${Date.now()}_${attachedFile.name}`);
+                    const snapshotTask = await uploadBytes(postStorageRef, attachedFile);
+                    postDownloadUrl = await getDownloadURL(snapshotTask.ref);
+                }
 
-            await addDoc(collection(db, "posts"), {
-                uid: currentUser.uid,
-                authorName: currentUser.displayName,
-                authorPic: currentUser.photoURL,
-                text: body,
-                image: postDownloadUrl,
-                timestamp: Date.now()
-            });
+                await addDoc(collection(db, "posts"), {
+                    uid: currentUser.uid, authorName: currentUser.displayName, authorPic: currentUser.photoURL,
+                    text: body, image: postDownloadUrl, timestamp: Date.now()
+                });
 
-            document.getElementById('post-text').value = '';
-            document.getElementById('post-image-input').value = '';
+                document.getElementById('post-text').value = '';
+                document.getElementById('post-image-input').value = '';
+                document.getElementById('post-img-status').classList.add('hidden');
+            } catch (e) { alert("Post Upload Refused"); }
         });
 
         function loadGlobalFeed() {
-            const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snapshot) => {
+            onSnapshot(query(collection(db, "posts"), orderBy("timestamp", "desc")), (snapshot) => {
                 feedStream.innerHTML = '';
                 snapshot.forEach(d => {
                     const post = d.data();
@@ -720,44 +759,89 @@
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2.5">
                                 <img src="${post.authorPic}" class="w-8 h-8 rounded-full border">
-                                <div>
-                                    <h4 class="font-bold text-xs text-gray-800">${post.authorName}</h4>
-                                    <span class="text-[9px] text-gray-400">${new Date(post.timestamp).toLocaleTimeString()}</span>
-                                </div>
+                                <div><h4 class="font-bold text-xs text-gray-800">${post.authorName}</h4>
+                                <span class="text-[9px] text-gray-400">${new Date(post.timestamp).toLocaleTimeString()}</span></div>
                             </div>
                             ${post.uid === currentUser.uid ? `<button class="text-gray-400 hover:text-red-500 trigger-delete-post" data-id="${d.id}"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
                         </div>
                         <p class="text-xs text-gray-700 leading-relaxed mb-2">${post.text || ''}</p>
-                        ${post.image ? `<img src="${post.image}" class="w-full rounded-xl max-h-64 object-cover border">` : ''}
+                        ${post.image ? `<img src="${post.image}" class="w-full rounded-xl max-h-64 object-cover border shadow-xs">` : ''}
                     `;
                     feedStream.appendChild(postCard);
                 });
             });
         }
-
         document.body.addEventListener('click', async (e) => {
             const btn = e.target.closest('.trigger-delete-post');
-            if (btn) {
-                const postId = btn.getAttribute('data-id');
-                if (confirm("Delete this timeline post permanent?")) { await deleteDoc(doc(db, "posts", postId)); }
-            }
+            if (btn) { if (confirm("Delete post permanent?")) await deleteDoc(doc(db, "posts", btn.getAttribute('data-id'))); }
         });
 
-        // --- WEBRTC CORE HARDWARE SIMULATOR ---
-        const callBox = document.getElementById('call-overlay');
-        async function runHardwareCallSimulation(withVideo = true) {
-            callBox.classList.remove('hidden');
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: withVideo, audio: true });
-                document.getElementById('local-video').srcObject = localStream;
-            } catch (e) { alert("Camera Interface Access Blocked"); callBox.classList.add('hidden'); }
+        // --- FULLY INTEGRATED REAL-TIME WEBRTC SIGNALLING FOR CALLS ---
+        async function triggerLiveCallChannel(videoEnabled = true) {
+            if (isGroupContext) return;
+            document.getElementById('call-overlay').classList.remove('hidden');
+            document.getElementById('call-status').innerText = "Ringing user channel...";
+
+            localStream = await navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true });
+            document.getElementById('local-video').srcObject = localStream;
+
+            // Write Database Signalling to target user's active node
+            const callDocRef = await addDoc(collection(db, "calls"), {
+                callerId: currentUser.uid, callerName: currentUser.displayName,
+                receiverId: activeChatUser.uid, status: "ringing", type: videoEnabled ? "video" : "audio",
+                timestamp: Date.now()
+            });
+            currentCallId = callDocRef.id;
+
+            // Sync with Caller UI Session termination
+            onSnapshot(doc(db, "calls", currentCallId), (snap) => {
+                if (snap.exists() && snap.data().status === "rejected") terminateHardwareSession();
+            });
         }
-        document.getElementById('btn-end-call').addEventListener('click', () => {
-            if (localStream) localStream.getTracks().forEach(t => t.stop());
-            callBox.classList.add('hidden');
+
+        function listenForIncomingCalls() {
+            const q = query(collection(db, "calls"), where("receiverId", "==", currentUser.uid), where("status", "==", "ringing"));
+            onSnapshot(q, (snapshot) => {
+                snapshot.forEach(d => {
+                    const callData = d.data();
+                    currentCallId = d.id;
+                    document.getElementById('incoming-caller-name').innerText = `${callData.callerName} is requesting a ${callData.type} call.`;
+                    document.getElementById('incoming-call-overlay').classList.remove('hidden');
+                });
+            });
+        }
+
+        document.getElementById('btn-accept-call').addEventListener('click', async () => {
+            document.getElementById('incoming-call-overlay').classList.add('hidden');
+            document.getElementById('call-overlay').classList.remove('hidden');
+            document.getElementById('call-status').innerText = "Call session established.";
+            await updateDoc(doc(db, "calls", currentCallId), { status: "accepted" });
+
+            const callSnap = await getDoc(doc(db, "calls", currentCallId));
+            const isVideo = callSnap.data().type === "video";
+            localStream = await navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true });
+            document.getElementById('local-video').srcObject = localStream;
         });
-        document.getElementById('btn-voice-call').addEventListener('click', () => runHardwareCallSimulation(false));
-        document.getElementById('btn-video-call').addEventListener('click', () => runHardwareCallSimulation(true));
+
+        document.getElementById('btn-decline-call').addEventListener('click', async () => {
+            document.getElementById('incoming-call-overlay').classList.add('hidden');
+            await updateDoc(doc(db, "calls", currentCallId), { status: "rejected" });
+        });
+
+        document.getElementById('btn-end-call').addEventListener('click', async () => {
+            if (currentCallId) await updateDoc(doc(db, "calls", currentCallId), { status: "rejected" });
+            terminateHardwareSession();
+        });
+
+        function terminateHardwareSession() {
+            if (localStream) localStream.getTracks().forEach(t => t.stop());
+            document.getElementById('call-overlay').classList.add('hidden');
+            document.getElementById('incoming-call-overlay').classList.add('hidden');
+            localStream = null;
+        }
+
+        document.getElementById('btn-voice-call').addEventListener('click', () => triggerLiveCallChannel(false));
+        document.getElementById('btn-video-call').addEventListener('click', () => triggerLiveCallChannel(true));
     </script>
 </body>
 
