@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger Ultra Pro Max - Final Stable Edition</title>
+    <title>Messenger Ultra Pro Max - Live Calling & Voice Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -132,7 +132,7 @@
             <i class="fab fa-facebook-messenger"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Messenger Pro</h2>
-        <p class="text-gray-500 mb-6">Stable Call, Live Voice & Instant Messaging</p>
+        <p class="text-gray-500 mb-6">Real-Time Voice, Calling & Posts Connected</p>
         <button id="btn-google-login"
             class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl hover:bg-gray-50 transition shadow-sm">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -289,29 +289,34 @@
         </div>
 
         <div id="calling-screen"
-            class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between p-8 hidden-pane text-white">
-            <div class="text-center mt-6 w-full">
+            class="absolute inset-0 bg-slate-950 z-50 flex flex-col items-center justify-between p-6 hidden-pane text-white">
+            <div class="text-center mt-4 w-full">
                 <img id="call-screen-avatar" src="https://via.placeholder.com/100"
-                    class="w-20 h-20 rounded-full object-cover mx-auto ring-4 ring-pink-500">
+                    class="w-20 h-20 rounded-full object-cover mx-auto ring-4 ring-pink-500 shadow-xl">
                 <h2 id="call-screen-name" class="text-lg font-bold mt-3">User Name</h2>
-                <p id="call-screen-type" class="text-gray-400 text-xs mt-1 animate-pulse">Connecting Stream...</p>
+                <p id="call-screen-type" class="text-gray-400 text-xs mt-1 animate-pulse">Establishing Live Stream...
+                </p>
 
-                <div id="video-streams-container" class="mt-4 grid grid-cols-2 gap-2 max-w-sm mx-auto hidden-pane">
-                    <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700 relative">
+                <div id="video-streams-container" class="mt-6 grid grid-cols-2 gap-3 max-w-sm mx-auto hidden-pane">
+                    <div class="bg-gray-900 rounded-xl overflow-hidden border-2 border-pink-500 relative shadow-md">
                         <video id="local-video" autoplay playsinline muted
-                            class="w-full h-32 object-cover bg-black"></video>
+                            class="w-full h-40 object-cover bg-black"></video>
+                        <span
+                            class="absolute bottom-1 left-2 text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white font-medium">You</span>
                     </div>
-                    <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700 relative">
-                        <video id="remote-video" autoplay playsinline class="w-full h-32 object-cover bg-black"></video>
+                    <div class="bg-gray-900 rounded-xl overflow-hidden border-2 border-gray-700 relative shadow-md">
+                        <video id="remote-video" autoplay playsinline class="w-full h-40 object-cover bg-black"></video>
+                        <span id="remote-label"
+                            class="absolute bottom-1 left-2 text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white font-medium">Remote</span>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-8 mb-4">
+            <div class="flex gap-8 mb-6">
                 <button id="btn-accept-call"
-                    class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-xl hover:bg-green-600 shadow-lg hidden-pane"><i
+                    class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-2xl hover:bg-green-600 shadow-2xl transition transform active:scale-90 hidden-pane"><i
                         class="fas fa-phone"></i></button>
                 <button onclick="endLiveCall()"
-                    class="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center text-xl hover:bg-red-700 shadow-lg"><i
+                    class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-2xl hover:bg-red-700 shadow-2xl transition transform active:scale-90"><i
                         class="fas fa-phone-slash"></i></button>
             </div>
         </div>
@@ -353,7 +358,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // 🔥 আপনার অরিজিনাল Firebase Credentials এখানে বসিয়ে নিন
         const firebaseConfig = {
@@ -373,9 +378,11 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null, activeChatUser = null, selectedMessageId = null, base64StoryImage = null;
-        let callRefGlobal = null, localStream = null, mediaRecorder = null, voiceChunks = [];
+        let callRefGlobal = null, localStream = null, peerConnection = null, mediaRecorder = null, voiceChunks = [];
 
-        // নোটিফিকেশন সাউন্ড ট্র্যাকার
+        // STUN / TURN সার্ভার কনফিগারেশন (WebRTC মিডিয়া স্ট্রিম বাউন্স করার জন্য ফ্রিতে গুগল প্রোভাইড করে)
+        const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+
         function playNotificationSound(type = 'sms') {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -398,7 +405,6 @@
         window.toggleThemePanel = function () { document.getElementById('theme-panel').classList.toggle('hidden-pane'); };
         window.changeTheme = function (themeName) { document.body.className = `bg-gray-100 h-screen flex justify-center items-center font-sans select-none theme-${themeName}`; document.getElementById('theme-panel').classList.add('hidden-pane'); };
 
-        // ℹ️ প্রোফাইল ভিউয়ার মডাল পপআপ লজিক
         window.showProfileDetails = function (name, avatar, email) {
             document.getElementById('modal-prof-name').innerText = name;
             document.getElementById('modal-prof-avatar').src = avatar;
@@ -429,9 +435,7 @@
                 document.getElementById('login-screen').classList.add('hidden-pane');
                 document.getElementById('main-app').classList.remove('hidden-pane');
                 document.getElementById('my-profile-pic').src = user.photoURL;
-
                 set(ref(db, 'users/' + user.uid), { uid: user.uid, name: user.displayName, email: user.email, avatar: user.photoURL });
-
                 loadChatList();
                 listenToGlobalNotifications();
                 listenForIncomingCalls();
@@ -460,34 +464,71 @@
             });
         }
 
-        // 📞 WebRTC লাইভ স্ট্রিম কলিং লজিক
+        // 📞 REAL-TIME WebRTC AUDIO/VIDEO CALLING ENGINE WITH LIVE STREAM
         window.initiateLiveCall = async function (type) {
             if (!activeChatUser || activeChatUser.isGroup) return;
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'Video' });
-                if (type === 'Video') {
-                    document.getElementById('local-video').srcObject = localStream;
-                    document.getElementById('video-streams-container').classList.remove('hidden-pane');
-                }
+                document.getElementById('local-video').srcObject = localStream;
+                document.getElementById('video-streams-container').classList.remove('hidden-pane');
+
                 const callId = `${currentUser.uid}_to_${activeChatUser.uid}`;
                 callRefGlobal = ref(db, 'calls/' + callId);
-                set(callRefGlobal, { id: callId, callerId: currentUser.uid, callerName: currentUser.displayName, callerAvatar: currentUser.photoURL, receiverId: activeChatUser.uid, type: type, status: 'ringing' });
 
                 document.getElementById('call-screen-name').innerText = activeChatUser.name;
                 document.getElementById('call-screen-avatar').src = activeChatUser.avatar;
-                document.getElementById('call-screen-type').innerText = `Calling (${type})...`;
+                document.getElementById('call-screen-type').innerText = `Ringing (${type})...`;
                 document.getElementById('btn-accept-call').classList.add('hidden-pane');
                 document.getElementById('calling-screen').classList.remove('hidden-pane');
                 playNotificationSound('call');
 
-                onValue(callRefGlobal, (snap) => { if (!snap.val()) endLiveCall(); else if (snap.val().status === 'connected') { stopNotificationSound(); document.getElementById('call-screen-type').innerText = `🎙️ Call Connected`; } });
-            } catch (err) { alert("Hardware Access Denied!"); }
+                peerConnection = new RTCPeerConnection(rtcConfig);
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                peerConnection.ontrack = (event) => {
+                    document.getElementById('remote-video').srcObject = event.streams[0];
+                };
+
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        push(ref(db, `calls/${callId}/callerCandidates`), event.candidate.toJSON());
+                    }
+                };
+
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
+                set(callRefGlobal, {
+                    id: callId, callerId: currentUser.uid, callerName: currentUser.displayName,
+                    callerAvatar: currentUser.photoURL, receiverId: activeChatUser.uid,
+                    type: type, status: 'ringing', offer: { sdp: offer.sdp, type: offer.type }
+                });
+
+                // অ্যানসার এবং আইস ক্যান্ডিডেট লিসেনার ট্র্যাকিং
+                onValue(ref(db, `calls/${callId}/answer`), async (snap) => {
+                    const answer = snap.val();
+                    if (answer && peerConnection.signalingState !== "stable") {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                        stopNotificationSound();
+                        document.getElementById('call-screen-type').innerText = `🎙️ Call Connected (Live)`;
+                    }
+                });
+
+                onValue(ref(db, `calls/${callId}/receiverCandidates`), (snap) => {
+                    if (snap.exists()) {
+                        Object.values(snap.val()).forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c)));
+                    }
+                });
+
+                onValue(callRefGlobal, (snap) => { if (!snap.val()) endLiveCall(); });
+
+            } catch (err) { alert("Microphone/Camera initialization failed!"); console.error(err); }
         };
 
         function listenForIncomingCalls() {
             onValue(ref(db, 'calls'), (snapshot) => {
                 if (!snapshot.val()) return;
-                Object.values(snapshot.val()).forEach(call => {
+                Object.values(snapshot.val()).forEach(async (call) => {
                     if (call.receiverId === currentUser.uid && call.status === 'ringing') {
                         callRefGlobal = ref(db, 'calls/' + call.id);
                         document.getElementById('call-screen-name').innerText = call.callerName;
@@ -499,13 +540,39 @@
 
                         document.getElementById('btn-accept-call').onclick = async () => {
                             try {
-                                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: call.type === 'Video' });
-                                if (call.type === 'Video') { document.getElementById('local-video').srcObject = localStream; document.getElementById('video-streams-container').classList.remove('hidden-pane'); }
-                                set(callRefGlobal, { status: 'connected' }, { merge: true });
                                 stopNotificationSound();
-                                document.getElementById('call-screen-type').innerText = `🎙️ Call Connected`;
+                                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: call.type === 'Video' });
+                                document.getElementById('local-video').srcObject = localStream;
+                                document.getElementById('video-streams-container').classList.remove('hidden-pane');
+
+                                peerConnection = new RTCPeerConnection(rtcConfig);
+                                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                                peerConnection.ontrack = (event) => {
+                                    document.getElementById('remote-video').srcObject = event.streams[0];
+                                };
+
+                                peerConnection.onicecandidate = (event) => {
+                                    if (event.candidate) {
+                                        push(ref(db, `calls/${call.id}/receiverCandidates`), event.candidate.toJSON());
+                                    }
+                                };
+
+                                await peerConnection.setRemoteDescription(new RTCSessionDescription(call.offer));
+                                const answer = await peerConnection.createAnswer();
+                                await peerConnection.setLocalDescription(answer);
+
+                                await update(ref(db, `calls/${call.id}`), { status: 'connected', answer: { sdp: answer.sdp, type: answer.type } });
+
+                                onValue(ref(db, `calls/${call.id}/callerCandidates`), (snap) => {
+                                    if (snap.exists()) {
+                                        Object.values(snap.val()).forEach(c => peerConnection.addIceCandidate(new RTCIceCandidate(c)));
+                                    }
+                                });
+
+                                document.getElementById('call-screen-type').innerText = `🎙️ Call Connected (Live)`;
                                 document.getElementById('btn-accept-call').classList.add('hidden-pane');
-                            } catch (e) { alert("Microphone/Camera access required!"); }
+                            } catch (e) { alert("Media connection failed!"); console.error(e); }
                         };
                     }
                 });
@@ -515,12 +582,13 @@
         window.endLiveCall = function () {
             stopNotificationSound();
             if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+            if (peerConnection) { peerConnection.close(); peerConnection = null; }
             if (callRefGlobal) { remove(callRefGlobal); callRefGlobal = null; }
             document.getElementById('calling-screen').classList.add('hidden-pane');
             document.getElementById('video-streams-container').classList.add('hidden-pane');
         };
 
-        // 🎙️ অডিও ভয়েস মেসেজ ইঞ্জেকশন ও প্লে-ব্যাক সলিউশন
+        // 🎙️ অডিও ভয়েস মেসেজ ইঞ্জিন (রেকর্ডিং এবং অন্য ইউজারের শোনার সলিউশন)
         const voiceBtn = document.getElementById('btn-voice-record');
         let recordSeconds = 0, recordingInterval = null;
 
@@ -529,21 +597,27 @@
             if (!mediaRecorder) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream); voiceChunks = [];
-                    mediaRecorder.ondataavailable = (e) => voiceChunks.push(e.data);
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                    voiceChunks = [];
+
+                    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) voiceChunks.push(e.data); };
+
                     mediaRecorder.onstop = () => {
-                        const blob = new Blob(voiceChunks, { type: 'audio/webm; codecs=opus' });
-                        const reader = new FileReader(); reader.readAsDataURL(blob);
+                        const blob = new Blob(voiceChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.readAsDataURL(blob);
                         reader.onloadend = () => {
                             let chatRoomId = activeChatUser.isGroup ? activeChatUser.uid : (currentUser.uid < activeChatUser.uid ? `${currentUser.uid}_${activeChatUser.uid}` : `${activeChatUser.uid}_${currentUser.uid}`);
                             const vRef = push(ref(db, 'messages/' + chatRoomId));
                             set(vRef, { id: vRef.key, sender_id: currentUser.uid, sender_name: currentUser.displayName, content: reader.result, type: 'voice', timestamp: Date.now() });
                         };
+                        stream.getTracks().forEach(t => t.stop());
                     };
+
                     mediaRecorder.start();
                     recordingInterval = setInterval(() => { recordSeconds++; let mins = String(Math.floor(recordSeconds / 60)).padStart(2, '0'); let secs = String(recordSeconds % 60).padStart(2, '0'); voiceTimer.innerText = `${mins}:${secs}`; }, 1000);
                     voiceTimer.classList.remove('hidden-pane'); voiceIcon.className = "fas fa-stop text-red-600 animate-ping";
-                } catch (err) { alert("Microphone assignment failed!"); }
+                } catch (err) { alert("Microphone permissions required!"); }
             } else {
                 clearInterval(recordingInterval); recordingInterval = null; recordSeconds = 0;
                 voiceTimer.classList.add('hidden-pane'); voiceIcon.className = "fas fa-microphone";
@@ -552,8 +626,9 @@
         };
 
         window.playVoiceNote = function (base64Data) {
+            if (!base64Data) return;
             const audio = new Audio(base64Data);
-            audio.play().catch(e => console.error("Audio Playback Error:", e));
+            audio.play().catch(e => alert("Audio playback issue on this browser!"));
         };
 
         // 💬 চ্যাট অপারেশনস ও মেসেজ উইন্ডো
@@ -591,7 +666,7 @@
 
                         let innerContent = '';
                         if (msg.type === 'image') innerContent = `<img src="${msg.content}" class="max-w-[180px] rounded-xl border cursor-pointer" onclick="viewFullImage('${msg.content}')">`;
-                        else if (msg.type === 'voice') innerContent = `<button onclick="playVoiceNote('${msg.content}')" class="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-xs font-bold shadow-sm"><i class="fas fa-play"></i> Play Voice Note</button>`;
+                        else if (msg.type === 'voice') innerContent = `<button onclick="playVoiceNote('${msg.content}')" class="flex items-center gap-2 px-4 py-2 bg-pink-100 text-pink-700 rounded-xl text-xs font-bold shadow-sm transition active:scale-95"><i class="fas fa-play"></i> Listen Voice Note</button>`;
                         else innerContent = `<p class="px-4 py-2 text-sm shadow-sm ${isMe ? 'my-bubble' : 'friend-bubble'}">${msg.content}</p>`;
 
                         const msgDiv = document.createElement('div'); msgDiv.innerHTML = innerContent;
@@ -632,7 +707,7 @@
             }
         };
 
-        // 👥 DISCOVER & FRIEND REQUESTS REAL-TIME ENGINE
+        // 👥 DISCOVER & FRIEND REQUESTS ENGINE
         function loadDiscoverUsers() {
             onValue(ref(db, 'users'), (snapshot) => {
                 const container = document.getElementById('discover-users-list'); container.innerHTML = ''; if (!snapshot.val()) return;
@@ -651,7 +726,6 @@
         }
 
         function loadPeopleSection() {
-            // ইনকামিং রিকোয়েস্ট লিসেনার ফিক্স
             onValue(ref(db, `requests/${currentUser.uid}`), (snapshot) => {
                 const box = document.getElementById('friend-requests-list'); box.innerHTML = '';
                 if (!snapshot.exists()) { box.innerHTML = '<p class="text-xs text-gray-400 p-2">No pending friend requests.</p>'; return; }
@@ -670,7 +744,6 @@
                 });
             });
 
-            // মিউচুয়াল ফ্রেন্ডস একটিভ লিস্ট রেন্ডারার
             onValue(ref(db, `friends/${currentUser.uid}`), (snapshot) => {
                 const box = document.getElementById('friends-list'); box.innerHTML = '';
                 if (!snapshot.exists()) return;
@@ -686,7 +759,7 @@
             });
         }
 
-        // 📢 STORIES TIMELINE (ডিলিট বাটন রিস্টোর ফিক্স সহ)
+        // 📢 STORIES TIMELINE
         document.getElementById('btn-select-story-img').onclick = () => document.getElementById('story-image-input').click();
         document.getElementById('story-image-input').onchange = (e) => {
             const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { base64StoryImage = ev.target.result; document.getElementById('story-img-preview').innerHTML = `<img src="${base64StoryImage}" class="w-full h-24 object-cover rounded">`; document.getElementById('story-img-preview').classList.remove('hidden-pane'); }; reader.readAsDataURL(file); }
@@ -726,7 +799,6 @@
             });
         }
 
-        // ইনপুট ইমেজ ফাইল সেন্ডার চ্যাট
         document.getElementById('btn-send-image').onclick = () => document.getElementById('image-input').click();
         document.getElementById('image-input').onchange = (e) => {
             const file = e.target.files[0];
@@ -763,9 +835,6 @@
             });
         }
     </script>
-</body>
-
-</html>
 </body>
 
 </html>
